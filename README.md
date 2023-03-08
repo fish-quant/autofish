@@ -2,7 +2,7 @@
 
 Python library to control an automated fluidics system and perform microscope acquisition for iterative FISH experiments.
 
-See dedicated documentation [**here**](https://github.com/muellerflorian/autofish/blob/master/docs/automator_manual.pdf) for how to install and use this package.
+See dedicated documentation [**here**](https://github.com/fish-quant/autofish/blob/master/docs/automator_manual.pdf) for how to install and use this package.
 
 **TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
 
@@ -24,4 +24,4 @@ See dedicated documentation [**here**](https://github.com/muellerflorian/autofis
 
 ### Building the Fluidics system
 
-See dedicated documentation [**here**](https://github.com/muellerflorian/autofish/blob/master/docs/fluidics__construction.pdf) for how to build the fluidics system.
+See dedicated documentation [**here**](https://github.com/fish-quant/autofish/blob/master/docs/fluidics__construction.pdf) for how to build the fluidics system.
