@@ -24,4 +24,4 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 
 ### Building the Fluidics system
 
-See dedicated documentation [**here**](https://github.com/fish-quant/autofish/blob/master/docs/fluidics__construction.pdf) for how to build the fluidics system.
+See dedicated documentation [**here**](https://github.com/fish-quant/autofish/blob/master/docs/fluidics_construction.pdf) for how to build the fluidics system.
