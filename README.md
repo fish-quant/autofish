@@ -2,9 +2,11 @@
 
 Python library to control an automated fluidics system and perform microscope acquisition for iterative FISH experiments.
 
-See dedicated documentation [**here**](https://github.com/muellerflorian/automator/blob/master/docs/automator_manual.pdf) for how to install and use this package.
+See dedicated documentation [**here**](https://github.com/muellerflorian/autofish/blob/master/docs/automator_manual.pdf) for how to install and use this package.
 
-__TESTED FOR WIN 10 only__: micromanager and most microscope controls work only under Windows.
+**TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
+
+![fluidics-system](docs/fluidics-overview.png)
 
 ## Getting started
 
@@ -22,15 +24,4 @@ __TESTED FOR WIN 10 only__: micromanager and most microscope controls work only 
 
 ### Building the Fluidics system
 
-See dedicated documentation [**here**](https://github.com/muellerflorian/automator/blob/master/docs/fluidics__construction.pdf) for how to build the fluidics system.
-
-## Some references
-
-### Serial port communication
-
-https://pythonhosted.org/pyserial/
-https://github.com/pyserial/pyserial
-
-### Tools to work with serial ports
-
-- Fee serial port monitor (be careful to download the free version): https://www.com-port-monitoring.com/
+See dedicated documentation [**here**](https://github.com/muellerflorian/autofish/blob/master/docs/fluidics__construction.pdf) for how to build the fluidics system.
