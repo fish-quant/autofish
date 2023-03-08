@@ -1,3 +1,6 @@
+![GitHub](https://img.shields.io/github/license/fish-quant/autofish)
+[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
+
 # Automator
 
 Python library to control an automated fluidics system and perform microscope acquisition for iterative FISH experiments.
