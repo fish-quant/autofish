@@ -1,11 +1,7 @@
 '''
-GUI for to initiate and control fluidics system.
+autoFISH GUI
 
 '''
-# ToDo
-# - Add quality check for fludics to make sure run terminated normally
-# - Closing the fluidics interface shouldn't terminate the serial connection
-
 
 # ---------------------------------------------------------------------------
 # Imports
@@ -21,17 +17,8 @@ from autofish.imager import pycroManager, fileSync
 from autofish.coordinator import Controller
 
 # ---------------------------------------------------------------------------
-# Globals
-# ---------------------------------------------------------------------------
-__version__ = '0.0.2'
-__author__ = 'Florian MUELLER'
-__email__ = 'muellerf.research@gmail.com'
-
-# ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
-
-# %%
 
 sg.theme('DarkAmber')
 NAME_SIZE = 23
@@ -42,6 +29,7 @@ def name(name):
     dots = NAME_SIZE-len(name)-2
     return sg.Text(name + ' ' + '•'*dots, size=(NAME_SIZE,1), justification='r',pad=(0,0), font='Courier 10')
 
+# Window for launch pad
 def make_window_control():
     layout = [[sg.Text('Specify fluidics & acquisition system!')],
               [sg.Button('Specify Fluidics', key='-Window-Fluidics-')],
@@ -56,7 +44,7 @@ def make_window_control():
     
     return sg.Window('Automator - automate sequential FISH', layout, location=(800,600), finalize=True)
 
-
+# Window for pycromanager
 def make_window_pycromanager():
     layout = [             
               [sg.Text('Choose config file:', size=(18, 1), key='-SPECIFY_CONFIG_MICROSCOPE-'), 
@@ -89,6 +77,7 @@ def make_window_pycromanager():
               [sg.Button('Exit')]]
     return sg.Window('Microscope - setup acquisition', layout, finalize=True)
 
+# Window for acquisition synchronization via a text file
 def make_window_file_sync():
     layout = [             
               [sg.Text('Choose sync file:', key='-SPECIFY_SYNC_FILE-'), 
@@ -102,8 +91,7 @@ def make_window_file_sync():
               [sg.Button('Exit')]]
     return sg.Window('Microscope - setup acquisition', layout, finalize=True)
 
-
-
+# Window for fluidics control
 def make_window_fluidics():
     layout = [[sg.Text('Fluidics specification')],
               [sg.Input(key='-IN-', enable_events=True)],
@@ -169,7 +157,7 @@ def make_window_fluidics():
 
     return sg.Window('Fluidics - setup fluidics runs', layout, finalize=True)
 
-
+# Main function
 def main():
 
     # >>> Logger
@@ -204,16 +192,9 @@ def main():
         #  Read event
         window, event, values = sg.read_all_windows(timeout=200)
                    
-        # Handle window closing events - only all to cloase main window
+        # Handle window closing events
         if event == sg.WIN_CLOSED or event == 'Exit':
-            '''
-            if window == win_scope_pycro:       # if closing scope window, mark as closed
-                win_scope_pycro = None
-            elif window == win_fluidics:        # if closing fluidics window, mark as closed
-                win_fluidics = None
-            elif window == win_sync_file:       # if closing fluidics window, mark as closed
-                win_sync_file = None               
-            '''
+
             if window == win_ctrl:            # if closing control window, exit program
                 window.close()
                 try:
@@ -227,6 +208,7 @@ def main():
                 break
         
         # ===== UPDATES for different interfaces
+        
         # > Control window
         if win_ctrl:
             if M and R:

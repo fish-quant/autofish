@@ -1,9 +1,17 @@
 import logging
 
 class Controller():
-
+    """Controller _summary_
+    """
     def __init__(self, Robot, Microscope,logger=None, logger_short=None):
-        
+        """__init__ _summary_
+
+        Args:
+            Robot (_type_): _description_
+            Microscope (_type_): _description_
+            logger (_type_, optional): _description_. Defaults to None.
+            logger_short (_type_, optional): _description_. Defaults to None.
+        """
         # Setup logger
         if isinstance(logger, type(None)):
             self.logger = logging.getLogger('AUTOMATOR-Robot')  # Logs the name of the function
@@ -24,7 +32,13 @@ class Controller():
         
     # Function to handle both logging calls and different logging types
     def log_msg(self,type,msg,msg_short=''):
-        
+        """log_msg _summary_
+
+        Args:
+            type (_type_): _description_
+            msg (_type_): _description_
+            msg_short (str, optional): _description_. Defaults to ''.
+        """
         if type == 'info':
             self.logger.info(msg)
             if msg_short:
@@ -43,7 +57,11 @@ class Controller():
         
     # Function to run ALL rounds (in order listed )
     def run_all_rounds(self, dir_save):
-    
+        """run_all_rounds _summary_
+
+        Args:
+            dir_save (_type_): _description_
+        """
         while len(self.R.rounds_available) > 0:
             round_id = self.R.rounds_available[0]
             
