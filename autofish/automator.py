@@ -114,7 +114,7 @@ class Robot():
         
     # Pause for specifid duration in seconds
     def pause(self, sleep_time):
-        """pause _summary_
+        """ Pauses robot for indicated duration in seconds.
 
         Args:
             sleep_time (int): time to sleep in seconds.
@@ -125,7 +125,7 @@ class Robot():
 
 
     def verify_flow(self, duration, volume_measured):
-        """verify_flow _summary_
+        """ Verifies measured flow against the expected flow.
 
         Args:
             flow_rate (float): flow rate in ml/min
@@ -157,7 +157,11 @@ class Robot():
             input("Press Enter to continue... ")
 
     def save_volume_measurements(self,file_save=None):
-        
+        """save_volume_measurements _summary_
+
+        Args:
+            file_save (_type_, optional): _description_. Defaults to None.
+        """
         if not file_save:
             now = datetime.now()
             data_string = now.strftime("%Y-%m-%d_%H-%M")
@@ -169,7 +173,11 @@ class Robot():
 
 
     def pump_run(self, pump_time):
-        
+        """pump_run _summary_
+
+        Args:
+            pump_time (_type_): _description_
+        """
         # Start flow measurement if sensor present
         if self.sensor:
             self.sensor.start()
@@ -520,10 +528,6 @@ class Robot():
         Returns:
             _type_: _description_
         """        
-        
-        # Generate coordinate list for whole and selected wells of a 96-well plate.
-        # Also adjusts for a rotated plate by using measured top left and bottom right positions from
-        # config file.
 
         # >>> Function to calculate well positions
         def rotate_around_point(point, radians, origin=(0,0)):
@@ -585,7 +589,6 @@ class Robot():
         Returns:
             _type_: _description_
         """        
-        
         
         step_action = list(step.keys())[0]
         step_argument = list(step.values())[0]
@@ -775,10 +778,11 @@ class Robot():
                 
     # >>>> Functions to initiate robot   
     def load_config_system(self):
-        """
-        Open config json file and returns configured hardware components.
+        """ Open config json file and returns configured hardware components.
         This file contains information about the serial commands used to
-        connect to each component.
+
+        Returns:
+            _type_: _description_
         """
         with open(self.config_file_system) as json_file:
             config_system = json.load(json_file)
@@ -795,8 +799,7 @@ class Robot():
     
     
     def close_serial_ports(self):
-        """
-        Close all open serial ports.
+        """ Closes all open serial ports.
         """
         self.logger.info('Closing all connections.')
         config_system = self.config_system
@@ -810,7 +813,8 @@ class Robot():
 
 
     def initiate_system(self):
-        """ If available, use predefined COM ports to connect to hardware. """
+        """ If available, use predefined COM ports to connect to hardware.
+        """
 
         config_system = self.config_system
         
@@ -872,9 +876,11 @@ class Robot():
 
 
     def assign_sensor(self):
-        '''
-        Use fluidics configuration file and generate a pump object
-        '''
+        """ Use fluidics configuration file and generate a pump object
+
+        Returns:
+            _type_: _description_
+        """
         self.log_msg('info', f'Assigning sensor: {self.config_system["flow_sensor"]}')
 
         if self.config_system['flow_sensor']['type'] == 'Sensirion_csv':
@@ -892,9 +898,11 @@ class Robot():
             return sensor
 
     def assign_pump(self):
-        '''
-        Use fluidics configuration file and generate a pump object
-        '''
+        """  Use fluidics configuration file and generate a pump object
+
+        Returns:
+            _type_: _description_
+        """
         self.log_msg('info', f'Assigning pump: {self.config_system["pump"]}')
         
         #Function selecting the appropriate pump class
@@ -977,14 +985,13 @@ class Robot():
             return CNCRouter3018PRO(ser, logger=self.logger)     
 
 
-
-
 # ---------------------------------------------------------------------------
 # Flow sensor
 # ---------------------------------------------------------------------------
 
 class flowSensor():
-    '''Base class for flow sensor.'''
+    """ Base class for flow sensor.
+    """
 
     def __init__(self):
         pass
@@ -993,18 +1000,38 @@ class flowSensor():
         return self.__class__.__name__
 
     def start(self):
-        '''Start measurment '''
+        """ Start measurment
+
+        Raises:
+            NotImplementedError: _description_
+        """
         raise NotImplementedError('No START function defined for this class!')
     
     def stop(self):
-        '''Stop measurment '''
+        """ Stop measurment
+
+        Raises:
+            NotImplementedError: _description_
+        """
         raise NotImplementedError('No STOP function defined for this class!')
 
 
 class sensirion_csv(flowSensor):    
+    """sensirion_csv 
     
-    def __init__(self, file_name, kernel_size, flow_min,logger=False):
 
+    Args:
+        flowSensor (_type_): _description_
+    """
+    def __init__(self, file_name, kernel_size, flow_min,logger=False):
+        """__init__ _summary_
+
+        Args:
+            file_name (_type_): _description_
+            kernel_size (_type_): _description_
+            flow_min (_type_): _description_
+            logger (bool, optional): _description_. Defaults to False.
+        """
         # Initiate logger
         if isinstance(logger, type(None)):
             # Logs the name of the function
@@ -1020,7 +1047,7 @@ class sensirion_csv(flowSensor):
 
     def start(self):
         """start _summary_
-        """        
+        """
         self.file_flow = open(self.file_name_flow, "rb")
         self.file_flow.seek(-2, os.SEEK_END)
         while self.file_flow.read(1) != b'\n':
@@ -1064,7 +1091,8 @@ class sensirion_csv(flowSensor):
 
 
 class plateController():
-    '''Base class for cnc plate controller.'''
+    """ Base class for cnc plate controller.
+    """
 
     def __init__(self):
         pass
@@ -1077,9 +1105,11 @@ class plateController():
 
 
 class CNCRouter3018PRO(plateController):     
-    '''
-    Control a CNC router 3018PRO with Gcode.
-    '''
+    """ Control a CNC router 3018PRO with Gcode.
+
+    Args:
+        plateController (_type_): _description_
+    """
 
     def __init__(self, ser, feed=500, logger=False):
 
@@ -1112,7 +1142,10 @@ class CNCRouter3018PRO(plateController):
         
 
     def check_stage(self):
-        """ Check. 
+        """check_stage _summary_
+
+        Returns:
+            _type_: _description_
         """
         ser = self.ser
         ser.flushInput()
@@ -1128,6 +1161,7 @@ class CNCRouter3018PRO(plateController):
         
         Args:
             pos (dict): contains new position as a dictionary, e.g.  {'X':5}
+
         """
         ser = self.ser
         for axis, coord in pos.items():
@@ -1172,7 +1206,8 @@ class CNCRouter3018PRO(plateController):
 # ---------------------------------------------------------------------------
  
 class pumpController():
-    '''Base class for pump controller.'''
+    """ Base class for pump controller.
+    """
 
     def __init__(self):
         pass
@@ -1190,11 +1225,19 @@ class pumpController():
 
 
 class RegloDigitalController(pumpController):
-    '''
-    Control a Reglo Digital peristaltic pump.
-    '''
+    """ Control a Reglo Digital peristaltic pump.
+
+    Args:
+        pumpController (_type_): _description_
+    """
 
     def __init__(self, ser, logger=None):
+        """__init__ _summary_
+
+        Args:
+            ser (_type_): _description_
+            logger (_type_, optional): _description_. Defaults to None.
+        """
         
         # Setting up logger
         if isinstance(logger, type(None)):
@@ -1208,7 +1251,14 @@ class RegloDigitalController(pumpController):
 
 
     def _check_response(self, response):
-        ''' Checks reponse of pump and reports success '''
+        """ Checks reponse of pump and reports success
+
+        Args:
+            response (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if response == '*':
             status = 1
             self.logger.info('Response: %s', response)
@@ -1223,7 +1273,11 @@ class RegloDigitalController(pumpController):
 
 
     def _send_cmd(self, ser_cmd):
-        ''' Sends command to pump'''
+        """ Sends command to pump
+
+        Args:
+            ser_cmd (_type_): _description_
+        """
 
         self.logger.info('Command send: %s', ser_cmd)
         self.ser.write(ser_cmd.encode('UTF-8'))
@@ -1255,18 +1309,21 @@ class RegloDigitalController(pumpController):
         self._check_response(response)
 
     def info(self):
-        ''' Start pump - expected response *'''
+        """ Get infos from pump - expected response *
+        """
         self.logger.info('PUMP: info')
         self._send_cmd('1#\r')
 
     def start(self):
-        ''' Start pump - expected response *'''
+        """ Start pump - expected response *
+        """
         self.logger.info('PUMP: start')
         self._send_cmd('1H\r')
 
 
     def stop(self):
-        ''' Stop pump - expected response *'''
+        """ Stop pump - expected response *
+        """
         self.logger.info('PUMP: stop')
         self._send_cmd('1I\r')
 
@@ -1315,7 +1372,8 @@ class RegloDigitalController(pumpController):
 # ---------------------------------------------------------------------------
         
 class valveController():
-    '''Base class for valve controller.'''
+    """ Base class for valve controller.'
+    """
 
     def __init__(self):
         pass
@@ -1354,7 +1412,6 @@ class HamiltonMVPController(valveController):
         Args:
             ser_cmd (_type_): _description_
         """        
-        
 
         self.logger.info('VALVE: command send: %s', ser_cmd)
         try:
@@ -1414,7 +1471,6 @@ class HamiltonMVPController(valveController):
             """
         # Move valve 1 to connect position, and valve 2
         elif valve_sel >=9 & valve_sel <=16:
-            
 
             # Move valve 1
             valve_id = 1
