@@ -1,7 +1,7 @@
 ![GitHub](https://img.shields.io/github/license/fish-quant/autofish)
-[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
+[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-390/)
 
-# Automator
+# autoFISH - automated FISH experiments
 
 Python library to control an automated fluidics system and perform microscope acquisition for iterative FISH experiments.
 
@@ -27,7 +27,7 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 
 ### Configuration files
 
-The behavior of the fluidics and acquistion system is defined by several config files. 
+The behavior of the fluidics and acquistion system is defined by several config files.
 
 * To test the installation of autofish, you can use demo configurations which require neither a microscope nor a fluidics systems: <https://github.com/fish-quant/autofish/tree/main/demo>
 
