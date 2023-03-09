@@ -1,0 +1,12 @@
+#Different buffers: stored as a list [valve-id,cnc-plate,cnc-well or position ]
+microscope:
+    type: 'Demo'
+    channel_group: 'Channel'
+    channels: ['DAPI', 'FITC']
+    channel_exposures_ms: [1,1]
+    z_start: 0 
+    z_end:  1
+    z_step: 0.5
+    order: 'cz'
+    mm_app_path: 'C:\Program Files\Micro-Manager-2.0-nightly'
+    mm_config_file: 'MMConfig_demo.cfg'

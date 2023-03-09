@@ -1,0 +1,98 @@
+#Different buffers: stored as a list [valve-id,cnc-plate,cnc-well or position ]
+buffers:
+    wash_valve4: [4,null,null]
+    wash_SSC_valve5: [5,null,null]
+    image_valve6: [6,null,null]
+    clean_plate: [6,1,A1]
+    prime_plate: [6,1,A2]
+    dapi_r1: [6,1,A3]
+    w_r1: [6,1,A4]
+    h_r1: [6,1,A5]
+    w_r2: [6,1,A6]
+    h_r2: [6,1,A7]
+    w_r3: [6,1,A8]
+    h_r3: [6,1,A9]
+    w_r4: [6,1,A10]
+    h_r4: [6,1,A11]
+    w_r5: [6,1,A12]
+    h_r5: [6,1,B1]
+    w_r6: [6,1,B2]
+    h_r6: [6,1,B3]
+    w_r7: [6,1,B4]
+    h_r7: [6,1,B5]
+    w_r8: [6,1,B6]
+    h_r8: [6,1,B7]  
+    w_r9: [6,1,B8]
+    h_r9: [6,1,B9]   
+    w_r10: [6,1,B10]
+    h_r10: [6,1,B11]
+    w_r11: [6,1,B12]
+    h_r11: [6,1,C1]   
+    w_r12: [6,1,C2]
+    h_r12: [6,1,C3]
+    w_r13: [6,1,C4]
+    h_r13: [6,1,C5]
+    w_r14: [6,1,C6]
+    h_r14: [6,1,C7]
+    w_r15: [6,1,C8]
+    h_r15: [6,1,C9]
+    w_r16: [6,1,C10]
+    h_r16: [6,1,C11]
+    w_r17: [6,1,C12]
+    h_r17: [6,1,D1]
+    w_r18: [6,1,D2]
+    h_r18: [6,1,D3]  
+    w_r19: [6,1,D4]
+    h_r19: [6,1,D5]  
+    w_r20: [6,1,D6]
+    h_r20: [6,1,D7]  
+
+
+# Sequence of a given fluidic run. Possible actions and parameters are "buffer": buffers listed in buffer_config.yaml, ii will be looped over; pump: time for pumping [s], pause: time for pause [s], image: 1.
+sequence:
+    - buffer: wash_SSC_valve5
+    - pump: 180
+    - pause: 60
+    - buffer: w_ii
+    - pump: 180
+    - buffer: h_ii
+    - pump: 180
+    - pause: 1800
+    - buffer: wash_valve4
+    - pump: 180
+    - pause: 60
+    - - round: r1
+      - buffer: dapi_ii
+      - pump: 180
+      - pause: 180
+      - buffer: wash_valve4
+      - pump: 180
+      - pause: 60 
+    - pump: 180
+    - pause: 60    
+    - buffer: wash_SSC_valve5
+    - pump: 180
+    - pause: 60
+    - buffer: image_valve6
+    - pump: 180  
+    - pause: 120     
+    - image: 1    
+    
+#Well plate setup: once calibrated, you usuall don't have to change this
+well_plate:
+    top_right:
+      x: 63
+      y: 99
+    bottom_left:
+      x: 0
+      y: 0
+    columns: 8
+    rows: 12
+    well_spacing: 9
+    z_base: -37
+    feed: 500
+
+
+    
+
+    

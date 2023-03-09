@@ -1,0 +1,14 @@
+microscope:
+    type: 'NIKON_TI'
+    timeout: 5000
+    xy_drive_name: 'TIXYDrive'
+    z_drive_name: 'TIPFSOffset'
+    channel_group: 'Channel'
+    channels: ['Cy3_75', 'Cy5_50','Dapi_50']
+    channel_blank: Cy3_0
+    channel_exposures_ms: [300,50,100]
+    z_start: -15
+    z_end: 60
+    z_step: 2.5
+    mm_app_path: 'C:\Program Files\Micro-Manager-2.0-nightly'
+    mm_config_file: 'Zstack_with_PFS.cfg'
