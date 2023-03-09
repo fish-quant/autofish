@@ -16,7 +16,7 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 ### Installation
 
 1. Download latest version of miniconda from [**here**](https://docs.conda.io/en/latest/miniconda.html) (can also be Python 3.X).
-2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.7`
+2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.9`
 3. Activate environment: `conda activate autofish`
 4. Pip install `pip install -i https://test.pypi.org/simple/ autofish`
 
