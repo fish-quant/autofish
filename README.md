@@ -25,10 +25,17 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 1. Open Anaconda terminal and activate environment: `conda activate autofish`
 2. Start user interface with command `autofish`
 
+### Configuration files
+
+The behavior of the fluidics and acquistion system is defined by several config files. 
+
+* To test the installation of autofish, you can use demo configurations which require neither a microscope nor a fluidics systems: <https://github.com/fish-quant/autofish/tree/main/demo>
+
+* We provide config files that we use on our system (with a Nikon Ti): <https://github.com/fish-quant/autofish/tree/main/configs>
+
 ### Building the Fluidics system
 
 See dedicated documentation [**here**](https://github.com/fish-quant/autofish/blob/master/docs/fluidics_construction.pdf) for how to build the fluidics system.
-
 
 ## Reporting a problem/suggestion
 
