@@ -80,6 +80,7 @@ class Robot():
         self.buffer_names = []
         self.current_buffer = None
         self.current_round = 'NA'
+        self.file_volume_measurements = None
 
         # Load robot configuration (but don't initiate the components) 
         self.config_file_system = config_file_system
@@ -156,21 +157,22 @@ class Robot():
    
             input("Press Enter to continue... ")
 
-    def save_volume_measurements(self,file_save=None):
+    def save_volume_measurements(self):
         """save_volume_measurements _summary_
 
         Args:
             file_save (_type_, optional): _description_. Defaults to None.
         """
-        if not file_save:
+        if not self.file_volume_measurements :
             now = datetime.now()
             data_string = now.strftime("%Y-%m-%d_%H-%M")
-            file_save = str(Path(self.config_file_experiment).parent / f'volume_log__{data_string}.csv')
+            self.file_volume_measurements = str(Path(self.config_file_experiment).parent / f'volume_log__{data_string}.csv')
         
-        with open(file_save, 'w', newline='') as csvfile:
+        with open(self.file_volume_measurements, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerows(self.volume_measurements)
 
+        return file_save
 
     def pump_run(self, pump_time):
         """pump_run _summary_
