@@ -172,8 +172,6 @@ class Robot():
             writer = csv.writer(csvfile)
             writer.writerows(self.volume_measurements)
 
-        return file_save
-
     def pump_run(self, pump_time):
         """pump_run _summary_
 
@@ -698,20 +696,20 @@ class Robot():
         runs_cond = list(buffers_round_all.keys())
         runs_cond.remove('default')
 
-        # Loop over all cyling buffers
+        # Loop over rounds and verify the cycling buffers
         round_id_all = []
         
         for round_id, buffers_round in buffers_round_all.items():
             buffers_index_all = []
             
-            # Loop over all buffers that are changed in the sequential run
-            for buffer_loop in buffers_round:
+            # Loop over all buffers that are used
+            for buffer_round in buffers_round:
                 buffers_index = []
                 
-                # For default runs: use regular expression to find name of run
+                # For default runs: use regular expression to find name of run IDs
                 if round_id == 'default':
                 
-                    reg_exp = re.compile(f'^{buffer_loop}(?P<buffer_id>.*)' , re.IGNORECASE)
+                    reg_exp = re.compile(f'^{buffer_round}(?P<buffer_id>.*)' , re.IGNORECASE)
 
                     # Find all run indices that are listed in buffer list
                     for buffer_name in self.buffer_names: 
@@ -727,10 +725,10 @@ class Robot():
                 
                 # Conditional runs: look specifically for buffer names
                 else:
-                    if buffer_loop+round_id in self.buffer_names:
+                    if buffer_round+round_id in self.buffer_names:
                         buffers_index.append(round_id)
                     else:
-                        self.log_msg('error', f'Buffer {buffer_loop+round_id} in conditional steps for round {round_id} not defined!')
+                        self.log_msg('error', f'Buffer {buffer_round+round_id} in conditional steps for round {round_id} not defined!')
                          
                 buffers_index_all.append(buffers_index)
                 
@@ -745,9 +743,9 @@ class Robot():
                 # Get rounds that are present for all buffers  
                 rounds_all_buffers = list(set.intersection(*map(set,buffers_index_all)))
                 
-                # >> Quality check - get rounds where not all cycling buffers are listed
+                # >> Quality check - get rounds where not all cycling buffers are defined
                 
-                # Get rounds that are present for one (or more) but not all buffers
+                # Get rounds that are are not defined forall buffers
                 rounds_all = list(set.union(*map(set,buffers_index_all)))
                 rounds_bad = list(set.difference(set(rounds_all), set(rounds_all_buffers)))
        
