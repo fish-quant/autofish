@@ -21,7 +21,8 @@
         "response": "VER:",
         "type": "CNCRouter3018PRO",
         "baudrate": 115200,
-        "COM": "COM11"
+        "COM": "COM11",
+        "feed": 500
     },
     "flow_sensor": {
         "type": "Sensirion_csv",

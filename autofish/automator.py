@@ -702,11 +702,13 @@ class Robot():
         for round_id, buffers_round in buffers_round_all.items():
             buffers_index_all = []
             
-            # Loop over all buffers that are used
+            # Loop over all buffers that are used in this round
             for buffer_round in buffers_round:
                 buffers_index = []
                 
-                # For default runs: use regular expression to find name of run IDs
+                # For default runs: find name of run IDs
+                #   For each buffer, a regular expression is used an compared against all specified buffers
+                #   This then reveals all run ids, only the ones that are present for all buffers will be kept.
                 if round_id == 'default':
                 
                     reg_exp = re.compile(f'^{buffer_round}(?P<buffer_id>.*)' , re.IGNORECASE)
@@ -830,8 +832,9 @@ class Robot():
                         try:
                             ser = serial.Serial(port = config_system[hardware_comp]['COM'],
                                                 baudrate = config_system[hardware_comp]['baudrate'],
-                                                bytesize=8,
-                                                parity='N',
+                                                parity=serial.PARITY_NONE,
+                                                stopbits=serial.STOPBITS_ONE,
+                                                bytesize=serial.EIGHTBITS,
                                                 timeout=0.5)
                             self.config_system[hardware_comp]['ser'] = ser
                             
@@ -928,6 +931,17 @@ class Robot():
             pump.info() # For unknown reasons the first command does not execute 
             pump.set_flowrate(self.config_system['pump']['Flowrate'])
             pump.set_revolution(self.config_system['pump']['Revolution'])
+        
+        elif self.config_system['pump']['type'] == 'MZR gear pump':
+            self.log_msg('info', f'Assign MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
+        
+            # Make sure that baudrate is correct
+            ser = self.config_system['pump']['ser']
+            ser.baudrate = self.config_system['pump']['baudrate']            
+            pump = MzrGearPump(ser, logger=self.logger)
+        
+            # Set speed
+            pump.set_speed(self.config_system['pump']['Speed'])
             
             return pump
 
@@ -985,7 +999,7 @@ class Robot():
             # Make sure that baudrate is correct
             ser = self.config_system['plate']['ser']
             ser.baudrate = self.config_system['plate']['baudrate'] 
-            return CNCRouter3018PRO(ser, logger=self.logger)     
+            return CNCRouter3018PRO(ser, self.config_system['plate']['feed'], logger=self.logger)     
 
 
 # ---------------------------------------------------------------------------
@@ -1036,10 +1050,6 @@ class sensirion_csv(flowSensor):
             logger (bool, optional): _description_. Defaults to False.
         """
         # Initiate logger
-        if isinstance(logger, type(None)):
-            # Logs the name of the function
-            self.logger = logging.getLogger('AUTOMATOR-SENSIRION-CSV')
-            self.logger.setLevel(100)
         self.logger = logger
 
         # Initiate
@@ -1114,18 +1124,13 @@ class CNCRouter3018PRO(plateController):
         plateController (_type_): _description_
     """
 
-    def __init__(self, ser, feed=500, logger=False):
+    def __init__(self, ser, logger):
 
         # Initiate logger
-        if isinstance(logger, type(None)):
-            # Logs the name of the function
-            self.logger = logging.getLogger('AUTOMATOR-PLATE-CNCrouter')
-            self.logger.setLevel(100)
         self.logger = logger
 
         # Initiate
         self.ser = ser
-        self.feed = feed
         self.logger.info(f'CNCRouter3018PRO controller initiated.')
         
         # Set status report
@@ -1227,14 +1232,14 @@ class pumpController():
         raise NotImplementedError('No STOP function defined for this class!')
 
 
-class RegloDigitalController(pumpController):
-    """ Control a Reglo Digital peristaltic pump.
+class MzrGearPump(pumpController):
+    """ Control a MZR gear pump.
 
     Args:
         pumpController (_type_): _description_
     """
 
-    def __init__(self, ser, logger=None):
+    def __init__(self, ser, logger):
         """__init__ _summary_
 
         Args:
@@ -1243,9 +1248,84 @@ class RegloDigitalController(pumpController):
         """
         
         # Setting up logger
-        if isinstance(logger, type(None)):
-            logger = logging.getLogger('AUTOMATOR-PUMP-REGLO')
-            logger.setLevel(100)
+        self.logger = logger
+        
+        # Initiate
+        self.ser = ser
+        self.V_rpm = 40 # Default speed of the pump
+        self.logger.info(f'MzrGearPump initiated.')
+        self.info()
+
+    def _send_cmd(self, ser_cmd):
+        """ Sends command to pump
+
+        Args:
+            ser_cmd (_type_): _description_
+        """
+        
+        self.ser.write(ser_cmd.encode('UTF-8'))
+        self.ser.flush()
+        response = self.ser.readline().decode('utf-8')
+        return response
+
+    def info(self):
+        """ Get infos from pump - expected response *
+        """
+        
+        # Get controller type and current temperature
+        self.logger.info('PUMP: info')
+        response_gtyp = self._send_cmd('GTYP\r')
+        respons_tem = self._send_cmd('TEM\r')
+        self.logger.info(f'Controller type: {response_gtyp.strip()}, current temperature: {respons_tem.strip()}')
+        
+
+    def start(self):
+        """ Start pump
+        """
+        self.logger.info('PUMP: start')
+        cmd = 'V'+str(self.V_rpm)+'\r'
+        self._send_cmd(cmd)
+
+
+    def stop(self):
+        """ Stop pump - expected response *
+        """
+        self.logger.info('PUMP: stop')
+        self._send_cmd('V0\r')
+
+
+    def set_speed(self, V_new):
+        """ Specify speed in rpm
+
+        For the mzr-4622 with a displacement volume of 12 μl
+        - 1000 RPM : flow rate of 12 ml/min
+        - 40 RPM   : flow rate of 0.48ml / min
+
+        Args:
+            V_new (int): Speed [rpm]
+        """        
+
+        self.logger.info(f'PUMP:  newspeed: {V_new} rpm')
+        self.V_rpm = V_new
+
+
+
+class RegloDigitalController(pumpController):
+    """ Control a Reglo Digital peristaltic pump.
+
+    Args:
+        pumpController (_type_): _description_
+    """
+
+    def __init__(self, ser, logger):
+        """__init__ _summary_
+
+        Args:
+            ser (_type_): _description_
+            logger (_type_, optional): _description_. Defaults to None.
+        """
+        
+        # Setting up logger
         self.logger = logger
         
         # Initiate
@@ -1395,17 +1475,14 @@ class HamiltonMVPController(valveController):
         valveController (_type_): _description_
     """    
 
-    def __init__(self, ser, logger=False):
+    def __init__(self, ser, feed, logger):
 
         # Setting up logger
-        if isinstance(logger, type(None)):
-            # Logs the name of the function
-            logger = logging.getLogger(__name__)
-            logger.setLevel(100)
         self.logger = logger
 
         # Initiate
         self.ser = ser
+        self.feed = feed
         self.valves_init(1)
         self.logger.info(f'HamiltonMVPController initiated.')
 

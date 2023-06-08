@@ -20,6 +20,15 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 3. Activate environment: `conda activate autofish`
 4. Pip install `pip install -i https://test.pypi.org/simple/ autofish`
 
+### Pycromanager
+
+One of the acquisition options is via Pycromanager. We found that keeping both micromanager and Pycromanager up-to-date can help to prevent problems. 
+
+**Last tested, compatible versions**:
+
+- Pycromanager: 0.27.2
+- Micromanager: nightly 20230224
+
 ### Starting autofish
 
 1. Open Anaconda terminal and activate environment: `conda activate autofish`
