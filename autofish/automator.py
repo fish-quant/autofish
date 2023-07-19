@@ -31,7 +31,7 @@ class Robot():
     to test if the code itself runs without errors. 
     """
     def __init__(self, config_file_system, logger=None, logger_short=None, demo=False):
-        
+
         # Robot status flags
         self.status = {
             'demo': False,
@@ -42,14 +42,14 @@ class Robot():
             'ready': False,
             'launch_acquisition': True      # Should images be acquired after the completion of this round
         }
-        
+
         # Setup logger
         if isinstance(logger, type(None)):
             self.logger = logging.getLogger('AUTOMATOR-Robot')  # Logs the name of the function
             self.logger.setLevel(100)
         else:
              self.logger = logger
-        
+
         if isinstance(logger_short, type(None)):
             self.logger_short = logging.getLogger('AUTOMATOR-Robot')  # Logs the name of the function
             self.logger_short.setLevel(100)
@@ -85,7 +85,7 @@ class Robot():
         # Load robot configuration (but don't initiate the components) 
         self.config_file_system = config_file_system
         self.config_system = self.load_config_system()
-        
+
         # Finished
         self.log_msg('info', 'Robot ready to be initiated.')
 
@@ -98,21 +98,21 @@ class Robot():
             msg (str): _description_
             msg_short (str, optional): _description_. Defaults to ''.
         """        
-        
+
         if type == 'info':
             self.logger.info(msg)
             if msg_short:
                 self.logger_short.info(msg_short)
             else:
                 self.logger_short.info(msg)
-                
+
         elif type == 'error':
             self.logger.error(msg)
             if msg_short:
                 self.logger_short.error(msg_short)
             else:
                 self.logger_short.error(msg)              
-        
+
     # Pause for specifid duration in seconds
     def pause(self, sleep_time):
         """ Pauses robot for indicated duration in seconds.
@@ -141,7 +141,7 @@ class Robot():
         volume_expected = round(flow_expected*duration/60,3)
         vol_diff = abs(volume_measured-volume_expected)/volume_expected
         self.log_msg('info', f'VOLUME. measured {volume_measured} ml, expected {volume_expected} ml -> diff {round(100*vol_diff)} %')
-        
+
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         self.volume_measurements.append([current_time,
@@ -154,7 +154,6 @@ class Robot():
         if vol_diff > tol:
             self.log_msg('error', f'Measured volume is outside of specified tolerance of expected volume. WILL STOP, user verification required.')
             #ToDo: add a real verification
-   
             input("Press Enter to continue... ")
 
     def save_volume_measurements(self):
@@ -167,7 +166,7 @@ class Robot():
             now = datetime.now()
             data_string = now.strftime("%Y-%m-%d_%H-%M")
             self.file_volume_measurements = str(Path(self.config_file_experiment).parent / f'volume_log__{data_string}.csv')
-        
+
         with open(self.file_volume_measurements, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerows(self.volume_measurements)
@@ -181,20 +180,20 @@ class Robot():
         # Start flow measurement if sensor present
         if self.sensor:
             self.sensor.start()
-        
+
         # Start pump for specified duration
         self.log_msg('info', f'Starting pump for {pump_time}s.')
         self.pump.start()
         time.sleep(pump_time)
         self.pump.stop()
         self.log_msg('info',f'Pump was running for {int(pump_time)} s.')
-            
+
         time.sleep(1)
-        
+
         # Stop flow measurement if sensor present
         if self.sensor:
             volume_measured = self.sensor.stop()
-            
+
             # Make sure that volume was returned (None for problems)
             if volume_measured is not None:
                 self.log_msg('info', f'Measured volume: {volume_measured} ml')
@@ -203,14 +202,13 @@ class Robot():
                     self.verify_flow(pump_time, volume_measured)
             else:
                 self.log_msg('error', f'No volume measurement returned. Check sensor!')
-            
 
     # Move robot to specified buffer
     def select_buffer(self, buffer_sel):
         """ Changes the valves and plate to the correct position for the provided buffer
 
         BUFFER POSITIONS
-        
+
         Buffer are provided with a tuple with 3 elements
         [valve-id, plate-id,plate-pos]
         
@@ -228,46 +226,45 @@ class Robot():
         Args:
             buffer_sel ([type]): [description]
         """
-        
+
         self.log_msg('info', f'Moving robot to buffer {buffer_sel}')
-        
+
         if buffer_sel == self.current_buffer:
             self.log_msg('info', f'Robot is already in place ... will chill out.')
 
-        else: 
-
+        else:
             buffers = self.experiment_config['buffers']
-                    
+
             if not buffer_sel in self.buffer_names:
                 self.log_msg('error', 'Buffer not defined in buffer list '+str(buffer_sel),'Buffer not defined in buffer list '+str(buffer_sel))
                 self.log_msg('error', 'Stopping robot','Stopping robot')
                 raise SystemExit
-            
+
             valve_id, plate_id, plate_pos = buffers[buffer_sel]
 
             # Move valve if specified
             self.log_msg('info', f'Moving valve to position: {valve_id}')
             if valve_id > 0:
-                
+
                 if  self.valve is None:
                     self.log_msg('error', 'NO VALVE DEFINED. STOPPING SYSTEM.','NO VALVE DEFINED. STOPPING SYSTEM.')
                     raise SystemExit
                 else:
                     self.valve.move(valve_id)
-                
+
             # Move plate
             self.log_msg('info', f'Plate ID: {plate_id}')
             self.log_msg('info', f'Plate POS: {plate_pos}')
-                
+
             # Either not used, or absolute position on plate
             if plate_id == 0:
-                
+
                 # Absolute position on plate
                 if plate_pos is not None:
-                    
+
                     reg_exp = re.compile('X(?P<X>.*)_Y(?P<Y>.*)_Z(?P<Z>.*)', re.IGNORECASE)
-                    match  = re.search(reg_exp, plate_pos)
-                    
+                    match = re.search(reg_exp, plate_pos)
+
                     if match:
                         match_dict = match.groupdict()
                         x_pos = float(match_dict['X'])            
@@ -276,61 +273,60 @@ class Robot():
                     else:
                         self.log_msg('error', f'Position on well not in good format: {plate_pos}')
                         raise SystemExit
-                        
+
                     # Move to XY position
                     self.plate.move_stage({'X':x_pos,'Y':y_pos})
                     while not 'Idl' in self.plate.check_stage() : #Wait until move is done before proceeding.
                         time.sleep(0.5)
-                        
+
                     # Move to Z position
                     self.plate.move_stage({'Z':z_pos})    
                     while not 'Idl' in self.plate.check_stage() : #Wait until move is done before proceeding.
                         time.sleep(0.5)    
-                        
+
             # Well (plate 1).
             if plate_id == 1:
-                
+
                 if plate_pos in self.well_coords.keys():
-                    
+
                     # Move to XY
                     new_pos_xy = {'x': self.well_coords[plate_pos]['x'],
                                 'y': self.well_coords[plate_pos]['y']}                                         
-                    
+
                     self.plate.move_stage(new_pos_xy)
                     while not 'Idl' in self.plate.check_stage() : # Wait until move is done before proceeding.
                         self.logger.info(self.plate.check_stage())
                         time.sleep(1)
-                    
+
                     # Move to Z
                     new_pos_z = {'z': self.well_coords[plate_pos]['z']}                                         
                     self.plate.move_stage(new_pos_z)
                     while not 'Idl' in self.plate.check_stage() : # Wait until move is done before proceeding.
                         time.sleep(1)
-                        
+
                 else:
                     self.log_msg('error', f'Well is not defined: {plate_pos}')
                     raise SystemExit
 
             self.current_buffer = buffer_sel
 
-        
-        
+
     def run_step(self, step, round_id, total_time):
         """ Run a single step in the fludics cycle.
-        
+
         == Demo
         Will check if demo is defined. If yes, no call to fluidics system will be executed, and
         times are shortened.
-        
+
         """
-        
+
         demo = self.status['demo']
-        
+
         action = list(step.keys())[0]
         param = list(step.values())[0]
-        
+
         self.log_msg('info', f'STEP: {action}, with parameter {param}')
-        
+
         # == Move robot to specified buffer
         if action == 'buffer': #
             if self.stop.is_set():
@@ -341,23 +337,23 @@ class Robot():
             if 'ii' in param:
                 param = param.replace('ii', round_id)
                 self.log_msg('info', f'Cycling buffer: {param}')
-            
+
             if not demo:
                 self.select_buffer(param)
-            
+
         # == Activate pump
         elif action == 'pump':
             self.log_msg('info', f'Remaining time (approx): {total_time}')
-            
+
             if self.stop.is_set():
                 self.logger.info('Stopping robot.')
                 raise SystemExit
-            
+
             if not demo:
                 self.pump_run(param)
-            
+
             time.sleep(1)
-            total_time =  total_time - float(param/60)
+            total_time = total_time - float(param/60)
 
         # == Pause
         elif action == 'pause':
@@ -367,28 +363,28 @@ class Robot():
                 raise SystemExit
             if not demo:
                 self.pause(param)
-            total_time =  total_time - float(param/60)
-            
+            total_time = total_time - float(param/60)
+
         # === Move robot to specified position
         elif action == 'zero_plate':
             self.log_msg('info', f'Moving plate to position Zero')
             self.plate.move_stage({'Z':0,'X':0,'Y':0})
-        
-         # === Wait for user input
+
+        # === Wait for user input
         elif action == 'wait':
-            self.log_msg('info', f'WAITING FOR USER INPUT ... press ENTER to continue')
+            self.log_msg('info', f'WAITING FOR USER INPUT ... press ENTER to continue.')
             input("Press Enter to continue...")       
 
         elif action == 'image':
-            
-            if param ==1: 
-                self.log_msg('info', f'Ready for imaging')
+
+            if param ==1:
+                self.log_msg('info', 'Ready for imaging')
                 self.status['launch_acquisition'] = True
             else:
-                self.log_msg('info', f'Will skip imaging this time')
+                self.log_msg('info', 'Will skip imaging this time')
                 self.status['launch_acquisition'] = False    
-            
-        elif action == 'round':    
+
+        elif action == 'round':
             pass
 
         # == Not defined  
@@ -950,8 +946,8 @@ class Robot():
 
         Returns:
             _type_: _description_
-        """        
-    
+        """
+
         self.log_msg('info', 'Assigning valve.')
 
         #Function selecting the appropriate valve class
@@ -959,7 +955,7 @@ class Robot():
             self.log_msg('error', 'No valve defined!')
             self.log_msg('error', f'{self.config_system["valve"]}')
             return False
-        
+
         if not 'ser' in self.config_system['valve'].keys():
             self.log_msg('error', 'No serial port connection for valve established!')
             self.log_msg('error', f'{self.config_system["valve"]}')
@@ -972,8 +968,8 @@ class Robot():
             ser = self.config_system['valve']['ser']
             ser.baudrate = self.config_system['valve']['baudrate'] 
             return HamiltonMVPController(ser, logger=self.logger)        
-  
-  
+
+
     def assign_plate(self):
         """assign_plate _summary_
 
@@ -982,12 +978,12 @@ class Robot():
         """        
         self.log_msg('info', 'Assigning plate robot.')
 
-        #Function selecting the appropriate valve class
+        # Function selecting the appropriate valve class
         if len(self.config_system['plate']['type']) == 0:
             self.log_msg('error', 'No plate robot defined!')
             self.log_msg('error', f'{self.config_system["plate"]}')
             return False
-        
+
         if not 'ser' in self.config_system['plate'].keys():
             self.log_msg('error', 'No serial port connection for plate robot established!')
             self.log_msg('error', f'{self.config_system["plate"]}')
@@ -995,7 +991,7 @@ class Robot():
 
         if self.config_system['plate']['type'] == 'CNCRouter3018PRO':
             self.log_msg('info', f'Assign 3018 plate robot on port {self.config_system["plate"]["ser"].portstr}')
-            
+
             # Make sure that baudrate is correct
             ser = self.config_system['plate']['ser']
             ser.baudrate = self.config_system['plate']['baudrate'] 
@@ -1023,7 +1019,7 @@ class flowSensor():
             NotImplementedError: _description_
         """
         raise NotImplementedError('No START function defined for this class!')
-    
+
     def stop(self):
         """ Stop measurment
 
@@ -1035,11 +1031,11 @@ class flowSensor():
 
 class sensirion_csv(flowSensor):    
     """sensirion_csv 
-    
 
     Args:
         flowSensor (_type_): _description_
     """
+    
     def __init__(self, file_name, kernel_size, flow_min,logger=False):
         """__init__ _summary_
 
@@ -1072,15 +1068,15 @@ class sensirion_csv(flowSensor):
 
         Returns:
             _type_: _description_
-        """        
-        flow_log =  [line.strip().decode( "utf-8" ) for line in self.file_flow.readlines()]
+        """
+        flow_log = [line.strip().decode( "utf-8" ) for line in self.file_flow.readlines()]
 
         flowreader = csv.reader(flow_log, delimiter=',', quotechar='"')
         data_raw = [data for data in flowreader]
 
         # Convert to float and remove , as separator for thousand
         data =[[float(x.replace(',','')) for x in row] for row in data_raw]
-        
+
         if len(data) <= 1:
             self.logger.error('No time-course of flow measurements can be read. Is logging active?')
             return None
@@ -1089,7 +1085,7 @@ class sensirion_csv(flowSensor):
             data_array = np.asarray(data)
             t_flow = data_array[:,1] - data_array[0,1]        # Set first time-point to 
             flow = data_array[:,2]
-            
+
             # Moving average and signal integration
             kernel = np.ones(self.kernel_size) / self.kernel_size
             flow_convolved = np.convolve(flow, kernel, mode='same')
@@ -1131,8 +1127,8 @@ class CNCRouter3018PRO(plateController):
 
         # Initiate
         self.ser = ser
-        self.logger.info(f'CNCRouter3018PRO controller initiated.')
-        
+        self.logger.info('CNCRouter3018PRO controller initiated.')
+
         # Set status report
         ser.flushInput()
         ser.write(('$10=2\n\r').encode('utf-8'))
@@ -1166,18 +1162,18 @@ class CNCRouter3018PRO(plateController):
     def move_stage(self, pos):
         """ Move stage to provided XY position in the dictionary.
         Will loop over provided values and move stage to coordinates.
-        
+
         Args:
             pos (dict): contains new position as a dictionary, e.g.  {'X':5}
 
         """
         ser = self.ser
         for axis, coord in pos.items():
-            
+
             if not axis in ('X','x','Y','y','Z','z'):
                 self.log_msg('error', 'Position has to be X, Y or Z')
                 continue
-            
+
             ser.write(('G0 Z0 \n').encode('utf-8')) # Always move to Z=0 first.
             while not 'Idl' in self.check_stage() : #Wait until move is done before proceeding.
                 self.logger.info(self.check_stage())
@@ -1190,15 +1186,15 @@ class CNCRouter3018PRO(plateController):
             grbl_out = ser.readline().decode('utf-8') # Wait for grbl response with carriage return
             self.logger.info('Moved to '+axis.upper()+'='+str(pos[axis]))
             self.logger.info('GRBL out:'+grbl_out)
-    
-    
+
+
     def jog_stage(self, jog_axis, jog_dist):
         """ Move stage with provided XYZ increment in the dictionary.
-        
+
         Args:
             jog (dict): contains new position as a dictionary, e.g.  {'X':5}
         """
-    
+
         ser = self.ser
         feed = self.feed
         ser.write(('$J=G91 G21 '+jog_axis.upper()+str(jog_dist)+'F'+str(feed)+' \n').encode('utf-8')) # Move code to GRBL, xy first
@@ -1207,12 +1203,12 @@ class CNCRouter3018PRO(plateController):
         grbl_out = ser.readline().decode('utf-8') # Wait for grbl response with carriage return
         self.logger.info('GRBL out:' + grbl_out)
         self.logger.info('GRBL status:' + self.check_stage())
-  
-    
+
+
 # ---------------------------------------------------------------------------
 #  pumpControlller class: to control the pump
 # ---------------------------------------------------------------------------
- 
+
 class pumpController():
     """ Base class for pump controller.
     """
@@ -1246,14 +1242,14 @@ class MzrGearPump(pumpController):
             ser (_type_): _description_
             logger (_type_, optional): _description_. Defaults to None.
         """
-        
+
         # Setting up logger
         self.logger = logger
-        
+
         # Initiate
         self.ser = ser
         self.V_rpm = 40 # Default speed of the pump
-        self.logger.info(f'MzrGearPump initiated.')
+        self.logger.info('MzrGearPump initiated.')
         self.info()
 
     def _send_cmd(self, ser_cmd):
@@ -1262,7 +1258,7 @@ class MzrGearPump(pumpController):
         Args:
             ser_cmd (_type_): _description_
         """
-        
+
         self.ser.write(ser_cmd.encode('UTF-8'))
         self.ser.flush()
         response = self.ser.readline().decode('utf-8')
@@ -1271,13 +1267,12 @@ class MzrGearPump(pumpController):
     def info(self):
         """ Get infos from pump - expected response *
         """
-        
+
         # Get controller type and current temperature
         self.logger.info('PUMP: info')
         response_gtyp = self._send_cmd('GTYP\r')
         respons_tem = self._send_cmd('TEM\r')
         self.logger.info(f'Controller type: {response_gtyp.strip()}, current temperature: {respons_tem.strip()}')
-        
 
     def start(self):
         """ Start pump
@@ -1304,7 +1299,6 @@ class MzrGearPump(pumpController):
         Args:
             V_new (int): Speed [rpm]
         """        
-
         self.logger.info(f'PUMP:  newspeed: {V_new} rpm')
         self.V_rpm = V_new
 
@@ -1324,10 +1318,10 @@ class RegloDigitalController(pumpController):
             ser (_type_): _description_
             logger (_type_, optional): _description_. Defaults to None.
         """
-        
+
         # Setting up logger
         self.logger = logger
-        
+
         # Initiate
         self.ser = ser
         self.logger.info(f'RegloDigitalController initiated.')
@@ -1353,7 +1347,6 @@ class RegloDigitalController(pumpController):
             self.logger.info('Command execution failed')
 
         return status
-
 
     def _send_cmd(self, ser_cmd):
         """ Sends command to pump
@@ -1403,13 +1396,11 @@ class RegloDigitalController(pumpController):
         self.logger.info('PUMP: start')
         self._send_cmd('1H\r')
 
-
     def stop(self):
         """ Stop pump - expected response *
         """
         self.logger.info('PUMP: stop')
         self._send_cmd('1I\r')
-
 
     def set_revolution(self, rev):
         """ Set revolution clockwise (CW) or counter_clockwise (CCW) 
@@ -1426,7 +1417,6 @@ class RegloDigitalController(pumpController):
         else:
             self.logger.info('Revolution direction is either CW or CCW!')
 
-
     def set_flowrate(self, rate, exp=-2):
         """ Specify flowrate 'rate' in ml/min
 
@@ -1440,20 +1430,19 @@ class RegloDigitalController(pumpController):
         Args:
             rate (_type_): _description_
             exp (int, optional): _description_. Defaults to -2.
-        """        
-
+        """
         self.logger.info('PUMP: set flow-rate: %f ml/min', rate)
 
         ee = '{}'.format(exp)
         mmmmm = str(int(rate * 10**(-(exp)))).zfill(4)
         ser_cmd = '1f' + mmmmm + ee + '\r'
         self._send_cmd(ser_cmd)
-        
+
 
 # ---------------------------------------------------------------------------
 #  valveController class: to control the valves
 # ---------------------------------------------------------------------------
-        
+
 class valveController():
     """ Base class for valve controller.'
     """
@@ -1473,7 +1462,7 @@ class HamiltonMVPController(valveController):
 
     Args:
         valveController (_type_): _description_
-    """    
+    """
 
     def __init__(self, ser, feed, logger):
 
@@ -1491,7 +1480,7 @@ class HamiltonMVPController(valveController):
 
         Args:
             ser_cmd (_type_): _description_
-        """        
+        """
 
         self.logger.info('VALVE: command send: %s', ser_cmd)
         try:
@@ -1499,13 +1488,12 @@ class HamiltonMVPController(valveController):
         except (UnboundLocalError, AttributeError):
             self.logger.error('Could not execute serial command.')
 
-
     def valves_init(self, valve_id):
         """valves_init _summary_
 
         Args:
             valve_id (_type_): _description_
-        """        
+        """ 
 
         self.logger.critical('Valve: initiate #  %s', valve_id)
 
@@ -1527,7 +1515,7 @@ class HamiltonMVPController(valveController):
 
         Args:
             valve_sel (_type_): _description_
-        """        
+        """
 
         self.logger.info(f'Move valve to buffer index {valve_sel}')
 
@@ -1539,18 +1527,18 @@ class HamiltonMVPController(valveController):
             self._send_cmd(ser_cmd)
             """
             self.logger.info(f' Connecting to valve {valve_id} on position {valve_pos}')
-            
+
             # Enable h-factor commands
             try:
-                
+
                 self.logger.info(ser_cmd)
                 self.ser.write(ser_cmd.encode('utf-8'))
-                
+
             except (UnboundLocalError, AttributeError):
                 self.logger.error('Could not move valve.')
             """
         # Move valve 1 to connect position, and valve 2
-        elif valve_sel >=9 & valve_sel <=16:
+        elif valve_sel >= 9 & valve_sel <= 16:
 
             # Move valve 1
             valve_id = 1
@@ -1571,5 +1559,3 @@ class HamiltonMVPController(valveController):
                 self.ser.write(ser_cmd.encode('utf-8'))
             except (UnboundLocalError, AttributeError):
                 self.logger.error('Could not move valve.')
-
-
