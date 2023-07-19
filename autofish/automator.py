@@ -145,14 +145,14 @@ class Robot():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         self.volume_measurements.append([current_time,
-                                     self.current_round,
-                                     self.current_buffer,
-                                     duration,
-                                     volume_expected,
-                                     volume_measured])
+                                        self.current_round,
+                                        self.current_buffer,
+                                        duration,
+                                        volume_expected,
+                                        volume_measured])
 
         if vol_diff > tol:
-            self.log_msg('error', f'Measured volume is outside of specified tolerance of expected volume. WILL STOP, user verification required.')
+            self.log_msg('error', 'Measured volume is outside of specified tolerance of expected volume. WILL STOP, user verification required.')
             # ToDo: add a real verification
             input("Press Enter to continue... ")
 
