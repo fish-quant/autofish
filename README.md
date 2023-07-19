@@ -1,7 +1,7 @@
 ![GitHub](https://img.shields.io/github/license/fish-quant/autofish)
-[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
+[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
-# autoFISH - automated FISH experiments
+# Automator
 
 Python library to control an automated fluidics system and perform microscope acquisition for iterative FISH experiments.
 
@@ -20,15 +20,6 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 3. Activate environment: `conda activate autofish`
 4. Pip install `pip install -i https://test.pypi.org/simple/ autofish`
 
-### Pycromanager
-
-One of the acquisition options is via Pycromanager. We found that keeping both micromanager and Pycromanager up-to-date can help to prevent problems. 
-
-**Last tested, compatible versions**:
-
-- Pycromanager: 0.27.2
-- Micromanager: nightly 20230224
-
 ### Starting autofish
 
 1. Open Anaconda terminal and activate environment: `conda activate autofish`
@@ -36,7 +27,7 @@ One of the acquisition options is via Pycromanager. We found that keeping both m
 
 ### Configuration files
 
-The behavior of the fluidics and acquistion system is defined by several config files.
+The behavior of the fluidics and acquistion system is defined by several config files. 
 
 * To test the installation of autofish, you can use demo configurations which require neither a microscope nor a fluidics systems: <https://github.com/fish-quant/autofish/tree/main/demo>
 
