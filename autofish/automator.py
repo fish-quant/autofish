@@ -1109,13 +1109,14 @@ class CNCRouter3018PRO(plateController):
         plateController (_type_): _description_
     """
 
-    def __init__(self, ser, logger):
+    def __init__(self, ser, feed, logger):
 
         # Initiate logger
         self.logger = logger
 
         # Initiate
         self.ser = ser
+        self.feed = feed
         self.logger.info('CNCRouter3018PRO controller initiated.')
 
         # Set status report
@@ -1446,14 +1447,13 @@ class HamiltonMVPController(valveController):
         valveController (_type_): _description_
     """
 
-    def __init__(self, ser, feed, logger):
+    def __init__(self, ser, logger):
 
         # Setting up logger
         self.logger = logger
 
         # Initiate
         self.ser = ser
-        self.feed = feed
         self.valves_init(1)
         self.logger.info(f'HamiltonMVPController initiated.')
 
