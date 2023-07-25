@@ -810,11 +810,19 @@ class Robot():
                 if ('COM' in config_system[hardware_comp].keys()):
                     self.log_msg('info', f"  Initiating {hardware_comp}: {config_system[hardware_comp]['type']} on serial port {config_system[hardware_comp]['COM']}")
 
+                    if 'parity' in config_system[hardware_comp].keys():
+                        if config_system[hardware_comp]['parity'].lower() == 'even':
+                            ser_parity = serial.PARITY_EVEN
+                        else:
+                            self.log_msg('error', f"  Parity not define : {config_system[hardware_comp]['parity']}")
+                    else:
+                        ser_parity = serial.PARITY_NONE
+
                     # Connect to serial port
                     try:
                         ser = serial.Serial(port=config_system[hardware_comp]['COM'],
                                             baudrate=config_system[hardware_comp]['baudrate'],
-                                            parity=serial.PARITY_NONE,
+                                            parity=ser_parity,
                                             stopbits=serial.STOPBITS_ONE,
                                             bytesize=serial.EIGHTBITS,
                                             timeout=0.5)
@@ -886,7 +894,7 @@ class Robot():
         Returns:
             _type_: _description_
         """
-        self.log_msg('info', f'Assigning pump: {self.config_system['pump']['type']}')
+        self.log_msg('info', f'Assigning pump: {self.config_system["pump"]["type"]}')
 
         # Function selecting the appropriate pump class
         if len(self.config_system['pump']['type']) == 0:
@@ -911,17 +919,10 @@ class Robot():
             pump.info()  # For unknown reasons the first command does not execute
             pump.set_flowrate(self.config_system['pump']['Flowrate'])
             pump.set_revolution(self.config_system['pump']['Revolution'])
-
+            return pump
+        
         elif self.config_system['pump']['type'] == 'LONGER BT100':
             self.log_msg('info', f'Assign LONGER BT100 pump on port {self.config_system["pump"]["ser"].portstr}')
-
-            # Make sure that baudrate is correct
-            ser = self.config_system['pump']['ser']
-            ser.baudrate = self.config_system['pump']['baudrate']
-            pump = RegloDigitalController(ser, logger=self.logger)
-
-        elif self.config_system['pump']['type'] == 'MZR gear pump':
-            self.log_msg('info', f'Assign MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
@@ -930,10 +931,19 @@ class Robot():
                                self.config_system['pump']['speed'],
                                self.config_system['pump']['revolution'],
                                logger=self.logger)
+            return pump
 
+        elif self.config_system['pump']['type'] == 'MZR gear pump':
+            self.log_msg('info', f'Assign MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
+
+            # Make sure that baudrate is correct
+            ser = self.config_system['pump']['ser']
+            ser.baudrate = self.config_system['pump']['baudrate']            
+            pump = MzrGearPump(ser, logger=self.logger)
+        
             # Set speed
             pump.set_speed(self.config_system['pump']['Speed'])
-
+            
             return pump
         
         else:
@@ -1501,7 +1511,7 @@ class LongerBT100(pumpController):
 
         # Serial command and checksum
         ser_cmd = '1F 06 57 4A ' + self.speed_hex + ' ' + str_start + ' ' + str_cw
-        fcs = self.xor_cmd(ser_cmd)
+        fcs = self._xor_cmd(ser_cmd)
         ser_cmd_complete = 'E9 ' + ser_cmd + ' ' + fcs
         self.logger.info('Command send: %s', ser_cmd_complete)
 
@@ -1512,13 +1522,13 @@ class LongerBT100(pumpController):
         """ Start pump.
         """
         self.logger.info('PUMP: start')
-        self._send_cmd(pumpt_start=True)
+        self._send_cmd(pump_start=True)
 
     def stop(self):
         """ Stop pump.
         """
         self.logger.info('PUMP: stop')
-        self._send_cmd(pumpt_start=False)
+        self._send_cmd(pump_start=False)
 
 
 # ---------------------------------------------------------------------------

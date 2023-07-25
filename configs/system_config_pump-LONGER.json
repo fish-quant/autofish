@@ -1,25 +1,26 @@
 {
     "pump": {
         "type": "LONGER BT100",
+        "COM": "COM10",
         "baudrate": 1200,
-        "COM": "COM4",
+        "parity": "even",
         "revolution": "CCW",
         "speed": 10
     },
     "valve": {
-        "test_command": "/1h30001R\r",
-        "response": "/0",
         "type": "HAMILTON MVP",
+        "COM": "COM7",
         "baudrate": 9600,
-        "COM": "COM7"
-    },
+        "test_command": "/1h30001R\r",
+        "response": "/0"
+        },
     "plate": {
+        "type": "CNCRouter3018PRO",
+        "COM": "COM8",
+        "baudrate": 115200,
         "wake_up": "\r\n\r\n",
         "test_command": "$I\n",
         "response": "VER:",
-        "type": "CNCRouter3018PRO",
-        "baudrate": 115200,
-        "COM": "COM11",
         "feed": 500
     },
     "flow_sensor": {
