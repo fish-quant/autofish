@@ -4,7 +4,6 @@
 
 import serial
 import time
-from serial.tools.list_ports import comports
 import re
 import json
 import yaml
@@ -28,7 +27,7 @@ class Robot():
     == demo mode
     Can be use in "demo" mode (via the fluidics_config.json file). Here, no connection
     to the fluidics components are established and runs times as set to a minimum. Permits
-    to test if the code itself runs without errors. 
+    to test if the code itself runs without errors.
     """
     def __init__(self, config_file_system, logger=None, logger_short=None, demo=False):
 
@@ -124,7 +123,6 @@ class Robot():
         time.sleep(int(sleep_time))
         self.logger.info('Paused for '+str(sleep_time))
 
-
     def verify_flow(self, duration, volume_measured):
         """ Verifies measured flow against the expected flow.
 
@@ -133,7 +131,7 @@ class Robot():
             duration (float): pump duration in seconds
             flow_measured (_type_): measured flow in ml/min
             tol (float, optional): Maximum difference between measured and theoretical flow. Defaults to 0.2.
-        """        
+        """
 
         flow_expected = self.flow['expected']
         tol = self.flow['tolerance']
@@ -636,7 +634,7 @@ class Robot():
 
                 else:
                     buffers_runs_cond = []
-                    run_time_cond = 0 
+                    run_time_cond = 0
                     for step_cond in step:
                         buffers_fix, buffers_runs_cond, run_time_cond = self.analyse_step(step_cond, buffers_fix, buffers_runs_cond, run_time_cond)
 
@@ -888,7 +886,7 @@ class Robot():
         Returns:
             _type_: _description_
         """
-        self.log_msg('info', 'Assigning pump')
+        self.log_msg('info', f'Assigning pump: {self.config_system['pump']['type']}')
 
         # Function selecting the appropriate pump class
         if len(self.config_system['pump']['type']) == 0:
@@ -906,27 +904,42 @@ class Robot():
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
-            ser.baudrate = self.config_system['pump']['baudrate']            
+            ser.baudrate = self.config_system['pump']['baudrate']
             pump = RegloDigitalController(ser, logger=self.logger)
 
             # Set flowrate and revolution direction as specfied in log file
-            pump.info() # For unknown reasons the first command does not execute 
+            pump.info()  # For unknown reasons the first command does not execute
             pump.set_flowrate(self.config_system['pump']['Flowrate'])
             pump.set_revolution(self.config_system['pump']['Revolution'])
+
+        elif self.config_system['pump']['type'] == 'LONGER BT100':
+            self.log_msg('info', f'Assign LONGER BT100 pump on port {self.config_system["pump"]["ser"].portstr}')
+
+            # Make sure that baudrate is correct
+            ser = self.config_system['pump']['ser']
+            ser.baudrate = self.config_system['pump']['baudrate']
+            pump = RegloDigitalController(ser, logger=self.logger)
 
         elif self.config_system['pump']['type'] == 'MZR gear pump':
             self.log_msg('info', f'Assign MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
-            ser.baudrate = self.config_system['pump']['baudrate']            
-            pump = MzrGearPump(ser, logger=self.logger)
+            ser.baudrate = self.config_system['pump']['baudrate']
+            pump = LongerBT100(ser, 
+                               self.config_system['pump']['speed'],
+                               self.config_system['pump']['revolution'],
+                               logger=self.logger)
 
             # Set speed
             pump.set_speed(self.config_system['pump']['Speed'])
 
             return pump
-
+        
+        else:
+            self.log_msg('error', 'UNKNOWN PUMP')
+            return False
+            
     def assign_valve(self):
         """assign_valve _summary_
 
