@@ -772,7 +772,7 @@ class Robot():
         """
         with open(self.config_file_system) as json_file:
             config_system = json.load(json_file)
-        self.log_msg('info', 'Config file for fluidics loaded!')
+        self.log_msg('info', 'Config file for fluidics loaded')
 
         # Check if demo mode is enabled
         if "demo" in config_system.keys():
@@ -804,11 +804,13 @@ class Robot():
 
         # Loop over all hardware components to connect to serial port
         if not self.status['demo']:
+            self.log_msg('info', "Establishing serial port connection to different hardware components")
+            
             for hardware_comp in config_system:
 
                 # >>>> Connect to serial port when specified
                 if ('COM' in config_system[hardware_comp].keys()):
-                    self.log_msg('info', f"  Initiating {hardware_comp}: {config_system[hardware_comp]['type']} on serial port {config_system[hardware_comp]['COM']}")
+                    self.log_msg('info', f"  {hardware_comp}: {config_system[hardware_comp]['type']} on port {config_system[hardware_comp]['COM']}")
 
                     if 'parity' in config_system[hardware_comp].keys():
                         if config_system[hardware_comp]['parity'].lower() == 'even':
@@ -874,7 +876,7 @@ class Robot():
         self.log_msg('info', 'Assigning sensor')
 
         if self.config_system['flow_sensor']['type'] == 'Sensirion_csv':
-            self.log_msg('info', 'Assign SENSIRION CSV flow sensor')
+            self.log_msg('info', 'SENSIRION CSV flow sensor with CSV file')
             if not Path(self.config_system['flow_sensor']['log_file']).is_file():
                 self.log_msg('error', f'File for flow measurement not found {self.config_system["flow_sensor"]["log_file"]}!')
                 self.log_msg('error', f'{self.config_system["flow_sensor"]}')
@@ -884,7 +886,6 @@ class Robot():
                                    self.config_system['flow_sensor']['kernel_size'],
                                    self.config_system['flow_sensor']['flow_min'],
                                    logger=self.logger)
-            self.log_msg('info', sensor)
 
             return sensor
 
@@ -908,7 +909,7 @@ class Robot():
             return False
 
         if self.config_system['pump']['type'] == 'REGLO DIGITAL':
-            self.log_msg('info', f'Assign REGLO DIGIAL pump on port {self.config_system["pump"]["ser"].portstr}')
+            self.log_msg('info', f'REGLO DIGIAL pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
@@ -922,7 +923,7 @@ class Robot():
             return pump
         
         elif self.config_system['pump']['type'] == 'LONGER BT100':
-            self.log_msg('info', f'Assign LONGER BT100 pump on port {self.config_system["pump"]["ser"].portstr}')
+            self.log_msg('info', f'LONGER BT100 pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
@@ -934,7 +935,7 @@ class Robot():
             return pump
 
         elif self.config_system['pump']['type'] == 'MZR gear pump':
-            self.log_msg('info', f'Assign MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
+            self.log_msg('info', f'MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
@@ -971,7 +972,7 @@ class Robot():
             return False
 
         if self.config_system['valve']['type'] == 'HAMILTON MVP':
-            self.log_msg('info', f'Assign HAMILTON valve on port {self.config_system["valve"]["ser"].portstr}')
+            self.log_msg('info', f'HAMILTON valve on port {self.config_system["valve"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['valve']['ser']
@@ -998,7 +999,7 @@ class Robot():
             return False
 
         if self.config_system['plate']['type'] == 'CNCRouter3018PRO':
-            self.log_msg('info', f'Assign 3018 plate robot on port {self.config_system["plate"]["ser"].portstr}')
+            self.log_msg('info', f'3018 plate robot on port {self.config_system["plate"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['plate']['ser']

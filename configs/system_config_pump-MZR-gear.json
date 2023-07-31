@@ -1,7 +1,7 @@
 {
     "pump": {
         "type": "MZR gear pump",
-        "COM": "COM8",
+        "COM": "COM10",
         "baudrate": 9600,
         "test_command": "GTYP\r",
         "response": "CSD-BX4",
@@ -9,14 +9,14 @@
     },
     "valve": {
         "type": "HAMILTON MVP",
-        "COM": "COM13",
+        "COM": "COM7",
         "baudrate": 9600,
         "test_command": "/1h30001R\r",
         "response": "/0"
     },
     "plate": {
         "type": "CNCRouter3018PRO",
-        "COM": "COM5",
+        "COM": "COM8",
         "baudrate": 115200,
         "wake_up": "\r\n\r\n",
         "test_command": "$I\n",

@@ -17,7 +17,7 @@
     },
     "plate": {
         "type": "CNCRouter3018PRO",
-        "COM": "COM11",
+        "COM": "COM8",
         "wake_up": "\r\n\r\n",
         "test_command": "$I\n",
         "response": "VER:",

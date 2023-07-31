@@ -33,7 +33,7 @@ def speed_to_hex(speed):
 
 # Parameters of pump
 speed = 18.2
-pump_start = False
+pump_start = True
 pump_cw = False
 
 # Construct control string
