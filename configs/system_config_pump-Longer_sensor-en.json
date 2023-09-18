@@ -30,6 +30,6 @@
         "flow_min": 20,
         "delimiter": ",",
         "separator_thousand": ",",       
-        "separator_decimal": ""
+        "separator_decimal": "."
     }
 }

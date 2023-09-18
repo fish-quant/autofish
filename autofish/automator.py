@@ -25,9 +25,9 @@ from pathlib import Path
 class Robot():
     """
     == demo mode
-    Can be use in "demo" mode (via the fluidics_config.json file). Here, no connection
-    to the fluidics components are established and runs times as set to a minimum. Permits
-    to test if the code itself runs without errors.
+    Can be use in "demo" mode (via the fluidics_config.json file). Here, no
+    connection to the fluidics components are established and runs times as
+    set to a minimum. Permits to test if the code itself runs without errors.
     """
     def __init__(self, config_file_system, logger=None, logger_short=None, demo=False):
 
@@ -805,7 +805,7 @@ class Robot():
         # Loop over all hardware components to connect to serial port
         if not self.status['demo']:
             self.log_msg('info', "Establishing serial port connection to different hardware components")
-            
+
             for hardware_comp in config_system:
 
                 # >>>> Connect to serial port when specified
@@ -921,7 +921,7 @@ class Robot():
             pump.set_flowrate(self.config_system['pump']['Flowrate'])
             pump.set_revolution(self.config_system['pump']['Revolution'])
             return pump
-        
+
         elif self.config_system['pump']['type'] == 'LONGER BT100':
             self.log_msg('info', f'LONGER BT100 pump on port {self.config_system["pump"]["ser"].portstr}')
 
@@ -1045,7 +1045,8 @@ class sensirion_csv(flowSensor):
         flowSensor (_type_): _description_
     """
 
-    def __init__(self, file_name, kernel_size, flow_min,logger=False):
+    def __init__(self, file_name, delimiter, separator_thousand,
+                 separator_decimal, kernel_size, flow_min, logger=False):
         """__init__ _summary_
 
         Args:
@@ -1059,7 +1060,10 @@ class sensirion_csv(flowSensor):
 
         # Initiate
         self.file_name_flow = file_name
-        self.kernel_size = kernel_size  # Kernel size of moving average 
+        self.delimiter = delimiter
+        self.separator_thousand = separator_thousand
+        self.separator_decimal = separator_decimal
+        self.kernel_size = kernel_size  # Kernel size of moving average
         self.flow_min = flow_min  # Minimum flow, below this value will be set to 0
 
     def start(self):
@@ -1078,11 +1082,15 @@ class sensirion_csv(flowSensor):
         """
         flow_log = [line.strip().decode("utf-8") for line in self.file_flow.readlines()]
 
-        flowreader = csv.reader(flow_log, delimiter=',', quotechar='"')
+        flowreader = csv.reader(flow_log,
+                                delimiter=self.delimiter, 
+                                quotechar='"')
         data_raw = [data for data in flowreader]
 
         # Convert to float and remove , as separator for thousand
-        data = [[float(x.replace(',', '')) for x in row] for row in data_raw]
+        #data = [[float(x.replace(',', '')) for x in row] for row in data_raw]
+        data = [[float(x.replace(self.separator_thousand, '')
+                       .replace(self.separator_decimal, '.')) for x in row] for row in data_raw]
 
         if len(data) <= 1:
             self.logger.error('No time-course of flow measurements can be read. Is logging active?')
