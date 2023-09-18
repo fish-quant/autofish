@@ -15,10 +15,25 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 
 ### Installation
 
+
+We recommend using a package manager (conda) to maintain a clean Python installation. This nees to be done only once.
+
 1. Download latest version of miniconda from [**here**](https://docs.conda.io/en/latest/miniconda.html).
 2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.9`
 3. Activate environment: `conda activate autofish`
-4. Pip install `pip install -i https://test.pypi.org/simple/autofish`
+4. Pip install autofish `pip install -i https://test.pypi.org/simple/autofish`
+
+#### Installation for development
+
+If you want to further develop the package, several options exist. A simply one is local installation. 
+
+
+Rather than performing the pip install from pypi (step 4 above), you can install it locally
+
+1. Download the zip archive locally of the repository
+2. Open Anaconda terminal at location of the autofish package.
+3. Activate environment: `conda activate autofish`
+4. Editable install `pip install . -e`
 
 ### Pycromanager
 
