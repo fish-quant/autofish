@@ -883,6 +883,9 @@ class Robot():
                 return False
 
             sensor = sensirion_csv(self.config_system['flow_sensor']['log_file'],
+                                   self.config_system['flow_sensor']['delimiter'],
+                                   self.config_system['flow_sensor']['separator_thousand'],
+                                   self.config_system['flow_sensor']['separator_decimal'],
                                    self.config_system['flow_sensor']['kernel_size'],
                                    self.config_system['flow_sensor']['flow_min'],
                                    logger=self.logger)
@@ -1199,6 +1202,16 @@ class CNCRouter3018PRO(plateController):
             grbl_out = ser.readline().decode('utf-8')  # Wait for grbl response with carriage return
             self.logger.info('Moved to '+axis.upper()+'='+str(pos[axis]))
             self.logger.info('GRBL out:'+grbl_out)
+
+    def move_zero(self):
+        """ Move stage to zero position
+        """
+        try:
+            self.move_stage({'Z': 0, 'X': 0, 'Y': 0})
+
+        except (UnboundLocalError, AttributeError) as e:
+            self.logger.error('Move to zero failed.')
+            self.logger.error(e)
 
     def jog_stage(self, jog_axis, jog_dist):
         """ Move stage with provided XYZ increment in the dictionary.

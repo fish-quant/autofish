@@ -28,6 +28,9 @@
         "type": "Sensirion_csv",
         "log_file": "C:\\Temp\\DataLog.csv",
         "kernel_size": 20,
-        "flow_min": 20
+        "flow_min": 20,
+        "delimiter": ",",
+        "separator_thousand": ",",       
+        "separator_decimal": "."
     }
 }

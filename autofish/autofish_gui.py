@@ -73,9 +73,7 @@ def make_window_pycromanager():
               [sg.Button('Launch one acquisition', key='-LAUNCH_ACQUISITION-'),
                sg.InputText('test', key='-NAME-ACQUISITION-',enable_events=True)
                ],
-
-              [sg.HorizontalSeparator()],
-              [sg.Button('Exit')]]
+              ]
     return sg.Window('Microscope - setup acquisition', layout, finalize=True)
 
 
@@ -87,9 +85,7 @@ def make_window_file_sync():
 
               [sg.HorizontalSeparator()],
               [sg.Button('Create acqusition object', key='-CREATE_ACQUISITION_OBJECT-')],
-
-              [sg.HorizontalSeparator()],             
-              [sg.Button('Exit')]]
+              ]
     return sg.Window('Microscope - setup acquisition', layout, finalize=True)
 
 
@@ -151,9 +147,6 @@ def make_window_fluidics():
         [sg.HorizontalSeparator()],
         [sg.Text(' Pippette robot status'),
          sg.InputText('', key='-PLATE-STATUS-', readonly=True)],
-
-        [sg.HorizontalSeparator()],
-        [sg.Button('Exit')]
         ]
 
     return sg.Window('Fluidics - setup fluidics runs', layout, finalize=True)
@@ -201,6 +194,11 @@ def main():
                 window.close()
                 try:
                     if (R is not None) and not R.status['demo']:
+                        try:
+                            R.pump.stop()
+                        except:
+                            logger.error('Could not stop pump.')      
+                        R.plate.move_zero()
                         R.close_serial_ports()
                 except (UnboundLocalError, AttributeError) as e:
                     logger_stream.error('Could not close serial connections')
@@ -483,14 +481,8 @@ def main():
                 logger.error('Zero stage fail failed.')
                 logger.error(e)
 
-        elif event == '-MOVE_ZERO-':               
-            try:
-                R.plate.move_stage({'Z': 0, 'X': 0, 'Y': 0})
-
-            except (UnboundLocalError, AttributeError) as e:
-                logger_stream.error('Move to zero failed.')
-                logger.error('Move to zero failed.')
-                logger.error(e)
+        elif event == '-MOVE_ZERO-':    
+            R.plate.move_zero()
 
         # >>>>> Priming/WASHING lines
         elif event == '-SELECT_BUFFER-':
@@ -524,7 +516,6 @@ def main():
                 run_single_round_thread = threading.Thread(target=R.run_single_round,
                                                            args = (round_id,))
                 run_single_round_thread.start()
-
                 run_single_round_thread.join()
                 window['-SEQ_LIST-'].update(values=R.rounds_available)
 

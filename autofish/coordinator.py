@@ -54,7 +54,6 @@ class Controller():
                 self.logger_short.error(msg)  
    
         
-        
     # Function to run ALL rounds (in order listed )
     def run_all_rounds(self, dir_save):
         """run_all_rounds _summary_
