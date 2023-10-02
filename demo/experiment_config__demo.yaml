@@ -17,7 +17,7 @@ buffers:
 
 # Sequence of a given fluidic run. Possible actions and parameters are "buffer": buffers listed in buffer_config.yaml, ii will be looped over; pump: time for pumping [s], pause: time for pause [s], image: 1.
 sequence:
-    - wait:
+#    - wait:
     - buffer: w_ii
     - pump: 180
     - buffer: h_ii

@@ -80,6 +80,7 @@ class Robot():
         self.current_buffer = None
         self.current_round = 'NA'
         self.file_volume_measurements = None
+        self.sensor = None
 
         # Load robot configuration (but don't initiate the components) 
         self.config_file_system = config_file_system
@@ -833,39 +834,39 @@ class Robot():
                     except serial.SerialException as e:
                         self.log_msg('error', f'  ERROR when opening serial port: {e}')
 
-        # >>> Assign all specified robot elements
-        try:
+            # >>> Assign all specified robot elements
+            try:
 
-            if 'pump' in self.config_system.keys():
-                self.pump = self.assign_pump()
-            else:
-                self.pump = None
+                if 'pump' in self.config_system.keys():
+                    self.pump = self.assign_pump()
+                else:
+                    self.pump = None
 
-            if 'plate' in self.config_system.keys():
-                self.plate = self.assign_plate()
-            else:
-                self.plate = None
+                if 'plate' in self.config_system.keys():
+                    self.plate = self.assign_plate()
+                else:
+                    self.plate = None
 
-            if 'valve' in self.config_system.keys():
-                self.valve = self.assign_valve()
-            else:
-                self.valve = None
+                if 'valve' in self.config_system.keys():
+                    self.valve = self.assign_valve()
+                else:
+                    self.valve = None
 
-            if 'flow_sensor' in self.config_system.keys():
-                self.sensor = self.assign_sensor()
-            else:
-                self.sensor = None
+                if 'flow_sensor' in self.config_system.keys():
+                    self.sensor = self.assign_sensor()
+                else:
+                    self.sensor = None
 
-            if False not in (self.pump, self.valve, self.plate, self.sensor):
-                self.log_msg('info', 'All components assigned.')
-                self.status['ports_assigned'] = True
-                self.status['robot_zeroed'] = False
-            else:
-                self.log_msg('error', 'Could not connect to one or more component (see error above).')
+                if False not in (self.pump, self.valve, self.plate, self.sensor):
+                    self.log_msg('info', 'All components assigned.')
+                    self.status['ports_assigned'] = True
+                    self.status['robot_zeroed'] = False
+                else:
+                    self.log_msg('error', 'Could not connect to one or more component (see error above).')
 
-        except (UnboundLocalError, AttributeError) as e:
-            self.log_msg('error', f'Assignment of robot components failed. {e}')
-            self.log_msg('error', config_system)
+            except (UnboundLocalError, AttributeError) as e:
+                self.log_msg('error', f'Assignment of robot components failed. {e}')
+                self.log_msg('error', config_system)
 
     def assign_sensor(self):
         """ Use fluidics configuration file and generate a pump object
@@ -1091,7 +1092,7 @@ class sensirion_csv(flowSensor):
         data_raw = [data for data in flowreader]
 
         # Convert to float and remove , as separator for thousand
-        #data = [[float(x.replace(',', '')) for x in row] for row in data_raw]
+        # data = [[float(x.replace(',', '')) for x in row] for row in data_raw]
         data = [[float(x.replace(self.separator_thousand, '')
                        .replace(self.separator_decimal, '.')) for x in row] for row in data_raw]
 
