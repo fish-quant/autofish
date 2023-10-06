@@ -71,7 +71,7 @@ class Robot():
         }
 
         self.volume_measurements = []
-        self.volume_measurements.append(['Time','round','buffer','duration','vol_expected','vol_measured'])
+        self.volume_measurements.append(['Time', 'round', 'buffer', 'duration', 'vol_expected', 'vol_measured'])
 
         # General robot configuration
         self.config_file_experiment = []
@@ -82,7 +82,7 @@ class Robot():
         self.file_volume_measurements = None
         self.sensor = None
 
-        # Load robot configuration (but don't initiate the components) 
+        # Load robot configuration (but don't initiate the components)
         self.config_file_system = config_file_system
         self.config_system = self.load_config_system()
 
@@ -200,7 +200,7 @@ class Robot():
                 if self.flow['verify']:
                     self.verify_flow(pump_time, volume_measured)
             else:
-                self.log_msg('error', f'No volume measurement returned. Check sensor!')
+                self.log_msg('error', 'No volume measurement returned. Check sensor!')
 
     # Move robot to specified buffer
     def select_buffer(self, buffer_sel):
@@ -229,14 +229,14 @@ class Robot():
         self.log_msg('info', f'Moving robot to buffer {buffer_sel}')
 
         if buffer_sel == self.current_buffer:
-            self.log_msg('info', 'Robot is already in place ... will chill out.')
+            self.log_msg('info', 'Robot is already in place ... not need to move.')
 
         else:
             buffers = self.experiment_config['buffers']
 
             if buffer_sel not in self.buffer_names:
-                self.log_msg('error', 'Buffer not defined in buffer list '+str(buffer_sel),'Buffer not defined in buffer list '+str(buffer_sel))
-                self.log_msg('error', 'Stopping robot','Stopping robot')
+                self.log_msg('error', 'Buffer not defined in buffer list '+str(buffer_sel), 'Buffer not defined in buffer list '+str(buffer_sel))
+                self.log_msg('error', 'Stopping robot', 'Stopping robot')
                 raise SystemExit
 
             valve_id, plate_id, plate_pos = buffers[buffer_sel]
@@ -246,7 +246,7 @@ class Robot():
             if valve_id > 0:
 
                 if self.valve is None:
-                    self.log_msg('error', 'NO VALVE DEFINED. STOPPING SYSTEM.','NO VALVE DEFINED. STOPPING SYSTEM.')
+                    self.log_msg('error', 'NO VALVE DEFINED. STOPPING SYSTEM.', 'NO VALVE DEFINED. STOPPING SYSTEM.')
                     raise SystemExit
                 else:
                     self.valve.move(valve_id)
@@ -266,21 +266,21 @@ class Robot():
 
                     if match:
                         match_dict = match.groupdict()
-                        x_pos = float(match_dict['X'])            
-                        y_pos = float(match_dict['Y'])  
-                        z_pos = float(match_dict['Z'])  
+                        x_pos = float(match_dict['X']) 
+                        y_pos = float(match_dict['Y'])
+                        z_pos = float(match_dict['Z'])
                     else:
                         self.log_msg('error', f'Position on well not in good format: {plate_pos}')
                         raise SystemExit
 
                     # Move to XY position
                     self.plate.move_stage({'X': x_pos, 'Y': y_pos})
-                    while 'Idl' not in self.plate.check_stage() : #Wait until move is done before proceeding.
+                    while 'Idl' not in self.plate.check_stage(): #Wait until move is done before proceeding.
                         time.sleep(0.5)
 
                     # Move to Z position
-                    self.plate.move_stage({'Z': z_pos})    
-                    while 'Idl' not in self.plate.check_stage() : #Wait until move is done before proceeding.
+                    self.plate.move_stage({'Z': z_pos})
+                    while 'Idl' not in self.plate.check_stage(): #Wait until move is done before proceeding.
                         time.sleep(0.5)
 
             # Well (plate 1).
@@ -290,7 +290,7 @@ class Robot():
 
                     # Move to XY
                     new_pos_xy = {'x': self.well_coords[plate_pos]['x'],
-                                  'y': self.well_coords[plate_pos]['y']}                                
+                                  'y': self.well_coords[plate_pos]['y']}
 
                     self.plate.move_stage(new_pos_xy)
                     while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
@@ -298,7 +298,7 @@ class Robot():
                         time.sleep(1)
 
                     # Move to Z
-                    new_pos_z = {'z': self.well_coords[plate_pos]['z']}                                         
+                    new_pos_z = {'z': self.well_coords[plate_pos]['z']}
                     self.plate.move_stage(new_pos_z)
                     while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
                         time.sleep(1)
@@ -366,12 +366,12 @@ class Robot():
         # === Move robot to specified position
         elif action == 'zero_plate':
             self.log_msg('info', 'Moving plate to position Zero')
-            self.plate.move_stage({'Z': 0, 'X': 0, 'Y': 0})
+            self.plate.move_zero()
 
         # === Wait for user input
         elif action == 'wait':
             self.log_msg('info', 'WAITING FOR USER INPUT ... press ENTER to continue.')
-            input("Press Enter to continue...")       
+            input("Press Enter to continue...")
 
         elif action == 'image':
 
@@ -485,7 +485,7 @@ class Robot():
         self.round_id_all, self.buffers_round_all, self.run_time_all = self.analyse_sequence()
 
         # Keep track which cyles where not executed yet (a round can only be executed once)
-        self.rounds_available = self.round_id_all  
+        self.rounds_available = self.round_id_all
 
         # Calculate well positions
         if 'well_plate' in self.experiment_config.keys():
@@ -561,9 +561,9 @@ class Robot():
                 x = bl_x+i*well_spacing
                 y = bl_y+j*well_spacing
                 x_rot, y_rot = rotate_around_point((x, y), phi_rotate, (bl_x, bl_y))
-                all_coords[chr(65+i)+str(1+j)]={'x': round(x_rot),
-                                                'y': round(y_rot),
-                                                'z': z_base}  # ASCII code: 65 corresponds to A
+                all_coords[chr(65+i)+str(1+j)] = {'x': round(x_rot),
+                                                  'y': round(y_rot),
+                                                  'z': z_base}  # ASCII code: 65 corresponds to A
         return all_coords
 
     def analyse_step(self, step, buffers_fix, buffers_cycle, run_time):
@@ -661,9 +661,9 @@ class Robot():
         buffer_fix_not_defined_bool = [item not in self.buffer_names for item in buffers_fix]
         buffer_fix_not_defined = list(compress(buffers_fix, buffer_fix_not_defined_bool))
         if buffer_fix_not_defined:
-            self.log_msg('error', f'Not all FIXED buffers are defined in buffer list! Please check: {buffer_fix_not_defined}')     
+            self.log_msg('error', f'Not all FIXED buffers are defined in buffer list! Please check: {buffer_fix_not_defined}')
         else:
-            self.log_msg('info', 'All FIXED buffers are defined in buffer list. Well done.')  
+            self.log_msg('info', 'All FIXED buffers are defined in buffer list. Well done.')
 
         # >> Update conditional runs
 
@@ -698,7 +698,7 @@ class Robot():
                 #   This then reveals all run ids, only the ones that are present for all buffers will be kept.
                 if round_id == 'default':
 
-                    reg_exp = re.compile(f'^{buffer_round}(?P<buffer_id>.*)' , re.IGNORECASE)
+                    reg_exp = re.compile(f'^{buffer_round}(?P<buffer_id>.*)', re.IGNORECASE)
 
                     # Find all run indices that are listed in buffer list
                     for buffer_name in self.buffer_names:
@@ -728,7 +728,7 @@ class Robot():
                 self.log_msg('info', f'No buffer identified to loop over.')
                 run_round_id = 'None'
             else:
-                # Get rounds that are present for all buffers  
+                # Get rounds that are present for all buffers
                 rounds_all_buffers = list(set.intersection(*map(set, buffers_index_all)))
 
                 # >> Quality check - get rounds where not all cycling buffers are defined
@@ -746,7 +746,7 @@ class Robot():
         buffer_cycle = buffers_cycle[0]
         reg_exp = re.compile(f'^{buffer_cycle}(?P<buffer_id>.*)', re.IGNORECASE)
         buffers_order = []
-        for buffer_name in self.buffer_names: 
+        for buffer_name in self.buffer_names:
 
             match = re.search(reg_exp, buffer_name)
             if match:
@@ -943,18 +943,18 @@ class Robot():
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
-            ser.baudrate = self.config_system['pump']['baudrate']            
+            ser.baudrate = self.config_system['pump']['baudrate']
             pump = MzrGearPump(ser, logger=self.logger)
-        
+
             # Set speed
             pump.set_speed(self.config_system['pump']['Speed'])
-            
+
             return pump
-        
+
         else:
             self.log_msg('error', 'UNKNOWN PUMP')
             return False
-            
+
     def assign_valve(self):
         """assign_valve _summary_
 
@@ -980,8 +980,8 @@ class Robot():
 
             # Make sure that baudrate is correct
             ser = self.config_system['valve']['ser']
-            ser.baudrate = self.config_system['valve']['baudrate'] 
-            return HamiltonMVPController(ser, logger=self.logger)        
+            ser.baudrate = self.config_system['valve']['baudrate']
+            return HamiltonMVPController(ser, logger=self.logger)
 
     def assign_plate(self):
         """assign_plate _summary_
@@ -1008,7 +1008,7 @@ class Robot():
             # Make sure that baudrate is correct
             ser = self.config_system['plate']['ser']
             ser.baudrate = self.config_system['plate']['baudrate'] 
-            return CNCRouter3018PRO(ser, self.config_system['plate']['feed'], logger=self.logger)     
+            return CNCRouter3018PRO(ser, self.config_system['plate']['feed'], logger=self.logger)
 
 
 # ---------------------------------------------------------------------------
@@ -1087,7 +1087,7 @@ class sensirion_csv(flowSensor):
         flow_log = [line.strip().decode("utf-8") for line in self.file_flow.readlines()]
 
         flowreader = csv.reader(flow_log,
-                                delimiter=self.delimiter, 
+                                delimiter=self.delimiter,
                                 quotechar='"')
         data_raw = [data for data in flowreader]
 
@@ -1191,8 +1191,9 @@ class CNCRouter3018PRO(plateController):
                 self.log_msg('error', 'Position has to be X, Y or Z')
                 continue
 
-            ser.write(('G0 Z0 \n').encode('utf-8'))  # Always move to Z=0 first.
-            while 'Idl' not in self.check_stage() :  # Wait until move is done before proceeding.
+            # Always move to Z=0 first
+            ser.write(('G0 Z0 \n').encode('utf-8'))
+            while 'Idl' not in self.check_stage():  # Wait until move is done before proceeding.
                 self.logger.info(self.check_stage())
                 time.sleep(0.5)
 
@@ -1208,7 +1209,20 @@ class CNCRouter3018PRO(plateController):
         """ Move stage to zero position
         """
         try:
-            self.move_stage({'Z': 0, 'X': 0, 'Y': 0})
+
+            # Move to XY
+            self.plate.move_stage({'X': 0, 'Y': 0})
+            while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
+                self.logger.info(self.plate.check_stage())
+                time.sleep(1)
+
+            # Move to Z
+            self.plate.move_stage({'z': 0})
+            while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
+                time.sleep(1)
+
+            # Reset current position
+            self.current_buffer = None
 
         except (UnboundLocalError, AttributeError) as e:
             self.logger.error('Move to zero failed.')
@@ -1322,7 +1336,7 @@ class MzrGearPump(pumpController):
 
         Args:
             V_new (int): Speed [rpm]
-        """   
+        """
         self.logger.info(f'PUMP:  newspeed: {V_new} rpm')
         self.V_rpm = V_new
 
@@ -1333,7 +1347,6 @@ class RegloDigitalController(pumpController):
     Args:
         pumpController (_type_): _description_
     """
-
     def __init__(self, ser, logger):
         """__init__ _summary_
 
@@ -1429,8 +1442,7 @@ class RegloDigitalController(pumpController):
 
         Args:
             rev (_type_): _description_
-        """        
-
+        """
         self.logger.info('PUMP: set revolution direction: %s', rev)
         if rev == 'CW':
             self._send_cmd('1J\r')
@@ -1524,7 +1536,7 @@ class LongerBT100(pumpController):
         else:
             str_start = '00'
 
-        # Revolution 
+        # Revolution
         if self.revolution.lower() == 'cw':
             str_cw = '01'
         elif self.revolution.lower() == 'ccw':
@@ -1639,18 +1651,7 @@ class HamiltonMVPController(valveController):
             valve_pos = valve_sel
             ser_cmd = '/{}h2600{}R\r'.format(valve_id, valve_pos)
             self._send_cmd(ser_cmd)
-            """
-            self.logger.info(f' Connecting to valve {valve_id} on position {valve_pos}')
 
-            # Enable h-factor commands
-            try:
-
-                self.logger.info(ser_cmd)
-                self.ser.write(ser_cmd.encode('utf-8'))
-
-            except (UnboundLocalError, AttributeError):
-                self.logger.error('Could not move valve.')
-            """
         # Move valve 1 to connect position, and valve 2
         elif valve_sel >= 9 & valve_sel <= 16:
 
