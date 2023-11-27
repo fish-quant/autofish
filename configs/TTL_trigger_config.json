@@ -1,0 +1,8 @@
+{
+    "TTL": {
+        "type": "arduino",
+        "COM": "COM10",
+        "baudrate": 9600,
+        "parity": "even"
+    }
+}

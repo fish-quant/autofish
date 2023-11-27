@@ -315,7 +315,7 @@ class Robot():
         == Demo
         Will check if demo is defined. If yes, no call to fluidics system will be executed, and
         times are shortened.
-
+    
         """
 
         demo = self.status['demo']
@@ -410,7 +410,7 @@ class Robot():
         # Check if this is the first call (and not a recursive one)
         if total_time is None:
 
-            # Reset imaging flag 
+            # Reset imaging flag
             self.status['launch_acquisition'] = True
 
             # Set run times
@@ -462,7 +462,7 @@ class Robot():
 
         return total_time
 
-    # >>>> Functions to initiate robot   
+    # >>>> Functions to initiate robot
     def load_config_experiment(self, config_file_experiment):
         """
         Open config json file and returns configured hardware components.
@@ -725,7 +725,7 @@ class Robot():
 
             # Covers extreme case where no cycling buffer is defined
             if len(buffers_index_all) == 0:
-                self.log_msg('info', f'No buffer identified to loop over.')
+                self.log_msg('info', 'No buffer identified to loop over.')
                 run_round_id = 'None'
             else:
                 # Get rounds that are present for all buffers

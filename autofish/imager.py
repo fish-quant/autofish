@@ -9,6 +9,7 @@ import logging
 import time
 import yaml
 import json
+import serial
 from threading import Event
 import gc
 from pathlib import Path
@@ -50,7 +51,7 @@ class Microscope:
         pass
 
     # Function to handle both logging calls and different logging types
-    def log_msg(self, type, msg,msg_short=''):
+    def log_msg(self, type, msg, msg_short=''):
         """log_msg _summary_
 
         Args:
@@ -147,13 +148,13 @@ class pycroManager(Microscope):
                 self.core = Core()
 
             self.status['micromanger_connect'] = True
-            self.log_msg('info','Communction with micromanager etablished.')
+            self.log_msg('info', 'Communction with micromanager etablished.')
 
         except Exception as e:
-            self.log_msg('error',f'Could not connect to micromanger ({e}).')
+            self.log_msg('error', f'Could not connect to micromanger ({e}).')
 
     # Read config file with some settings
-    def load_position_list(self,file_pos=None):
+    def load_position_list(self, file_pos=None):
         """load_position_list _summary_
 
         For Nikon
@@ -212,7 +213,7 @@ class pycroManager(Microscope):
             n_z = len(z)
 
             if n_z > 0 and n_x != n_z:
-                self.log_msg('error','Problem with position list. Not every xy position has a z position')
+                self.log_msg('error', 'Problem with position list. Not every xy position has a z position')
                 return
 
             # Create array with xyz positions
@@ -226,7 +227,7 @@ class pycroManager(Microscope):
         # Reset acquisition event flag
         self.status['acquisition_event'] = False
 
-    # Create the acquisition event with the specified parameters in the config file    
+    # Create the acquisition event with the specified parameters in the config file
     def create_acquisition_event(self):
         """create_acquisition_event _summary_
         """
@@ -260,9 +261,10 @@ class pycroManager(Microscope):
         Args:
             dir_save (_type_): _description_
             name_base (str, optional): _description_. Defaults to 'test'.
-        """        
+        """
+
         # Regular acquisition
-        self.log_msg('info', f'Start acquisition.')
+        self.log_msg('info', 'Start acquisition.')
         with Acquisition(directory=dir_save, name=name_base, show_display=False, timeout=self.timeout) as acq:
             self.log_msg('info', f'Acquisition will be saved as: {acq._dataset_disk_location}')
             acq.acquire(self.event)
@@ -271,7 +273,7 @@ class pycroManager(Microscope):
 
         # Blank acquisition
         if self.event_blank:
-            self.log_msg('info', f'Start blank acquisition.')
+            self.log_msg('info', 'Start blank acquisition.')
             with Acquisition(directory=dir_save, name='_delete_blank', show_display=False, timeout=self.timeout) as acq:
                 self.log_msg('info', f'Acquisition will be saved as: {acq._dataset_disk_location}')
                 acq.acquire(self.event_blank)
@@ -279,6 +281,88 @@ class pycroManager(Microscope):
             gc.collect()
 
         self.log_msg('info', 'End of acquisition')
+
+
+# ------------------------------------------------------------------------------------------------
+# Control with sync file : existing file, 1 to start acquisition, 0 to signal acquisition is done
+# ------------------------------------------------------------------------------------------------
+
+
+class TTL_sync(Microscope):
+    def __init__(self, **kargs):
+
+        # Involve the init function of the parent class
+        super().__init__(**kargs)
+
+        # For threading
+        self.stop = Event()
+
+        # Robot status flags
+        self.status = {
+        }
+
+    def connect_serial_port(self, file_config_TTL):
+        """ Load json file with configuration of serial communication with Arduino for TTL synchronization.
+
+        Args:
+            file_config_TTL (_type_): _description_
+        """
+
+        # Load file
+        with open(file_config_TTL) as json_file:
+            config_TLL = json.load(json_file)
+        self.log_msg('info', 'Config file for TTL loaded')
+
+        # Connect to port
+        try:
+            ser = serial.Serial(port=config_TLL['TTL']['COM'],
+                                baudrate=config_TLL['TTL']['baudrate'],
+                                #parity=config_TLL['TTL']['parity'],
+                                stopbits=serial.STOPBITS_ONE,
+                                bytesize=serial.EIGHTBITS,
+                                timeout=0.5)
+            config_TLL['TTL']['ser'] = ser
+            self.log_msg('info', '  Connected to Arduino')
+
+        except serial.SerialException as e:
+            self.log_msg('error', f'  ERROR when opening serial port: {e}')
+
+        self.config_TLL = config_TLL
+
+    def acquire_images(self):
+        """acquire_images _summary_
+        """
+
+        # Start acquisition by sending command to serial port
+        # send 'Start acquisition'
+        self.config_TLL['TTL']['ser'].write(('start' + '\n').encode())
+
+        # Read from serial port until acquisition is done
+        self.log_msg('info', 'Checking TTL for completion')
+
+        imaging = True
+
+        while imaging:
+
+            # Read from serial
+            txt_serial = self.config_TLL['TTL']['ser'].readline().decode('ascii').rstrip()
+            #self.log_msg('info', f'Serial received {txt_serial}')
+
+            if txt_serial == 'finished':
+                self.log_msg('info', 'Acqusition seems to be terminated')
+                imaging = False
+
+            time.sleep(0.5)
+
+    def close_serial_port(self):
+        """_summary_
+        """
+        if 'ser' in self.config_TLL['TTL'].keys():
+                ser = self.config_TLL['TTL']['ser']
+                if ser is not None:
+                    if ser.isOpen() is True:
+                        ser.close()
+
 
 # ------------------------------------------------------------------------------------------------
 # Control with sync file : existing file, 1 to start acquisition, 0 to signal acquisition is done
@@ -303,7 +387,7 @@ class fileSync_write(Microscope):
 
         Args:
             name_sync_file (_type_): _description_
-        """        
+        """
         with open(name_sync_file, 'w') as f:
             f.write('0')
         self.name_sync_file = name_sync_file
@@ -317,7 +401,7 @@ class fileSync_write(Microscope):
             f.write('1')
 
         # Read status of sync file
-        self.log_msg('info', 'Checking the sync file for completion')
+        self.log_msg('info', 'Checking sync file for completion')
 
         syncfile = open(self.name_sync_file, "r")
         imaging = True

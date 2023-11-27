@@ -73,7 +73,7 @@ class Controller():
             if self.R.status['launch_acquisition']:
 
                 # Acquisition with file sync
-                if (self.M.__class__.__name__) in {'fileSync_write', 'fileSync_create'}:
+                if (self.M.__class__.__name__) in {'fileSync_write', 'fileSync_create','TTL_sync'}:
                     self.M.acquire_images()
 
                 # Acquisition with pycromanager
@@ -99,6 +99,10 @@ class Controller():
                                 acquisition_needed = True
                             else:
                                 acquisition_needed = False
+
+                # Error when unknown instance of Microscope instance
+                else:
+                    self.log_msg('error', f'Unknown Microscope instance ({self.M.__class__.__name__}).')
 
             # ToDo: check that acquisition worked out
             # ToDo: create thread also for imaging (or combined with fluidics)

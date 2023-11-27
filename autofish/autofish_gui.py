@@ -12,7 +12,7 @@ from datetime import datetime
 import pathlib
 
 from autofish.automator import Robot
-from autofish.imager import pycroManager, fileSync_write, fileSync_create
+from autofish.imager import pycroManager, fileSync_write, fileSync_create, TTL_sync
 from autofish.coordinator import Controller
 
 # ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ from autofish.coordinator import Controller
 
 sg.theme('DarkAmber')
 NAME_SIZE = 23
-microscope_options = ('pycromanager', 'file synce - create', 'file sync - write')
+microscope_options = ('pycromanager', 'TTL sync', 'file synce - create', 'file sync - write')
 
 
 def name(name):
@@ -74,6 +74,17 @@ def make_window_pycromanager():
                ],
               ]
     return sg.Window('Microscope - setup acquisition', layout, finalize=True)
+
+
+# Window for acquisition synchronization via a text file with changing content
+def make_window_TTL_sync():
+    layout = [[sg.Text('Choose TTL config file:', key='-SPECIFY_TTL_CONFIG_FILE-'),
+               sg.FileBrowse(file_types=(("config file", '*.json'),),  target='-TTL_CONFIG_FILE-', disabled=False),
+               sg.InputText('specify-config-microscope', key='-TTL_CONFIG_FILE-')],
+              [sg.HorizontalSeparator()],
+              [sg.Button('Connect to SYNC box', key='-INIT_TTL_SYNC-')],
+              ]
+    return sg.Window('File-synchronization : write', layout, finalize=True)
 
 
 # Window for acquisition synchronization via a text file with changing content
@@ -212,6 +223,13 @@ def main():
                             logger.error('Could not stop pump.')
                         R.plate.move_zero()
                         R.close_serial_ports()
+
+                    if (M is not None) and (M.__class__.__name__ == 'TTL_sync'):
+                        try:
+                            M.close_serial_port()
+                        except:
+                            logger.error('No serial port .')
+
                 except (UnboundLocalError, AttributeError) as e:
                     logger_stream.error('Could not close serial connections')
                     logger.error('Could not close serial connections')
@@ -341,6 +359,8 @@ def main():
                 win_sync_file_create = make_window_file_sync_create()
             elif (scope_sync == 'file sync - write'):
                 win_sync_file_write = make_window_file_sync_write()
+            elif (scope_sync == 'TTL sync'):
+                win_sync_TTL = make_window_TTL_sync()
 
         elif event == '-Window-Fluidics-' and not win_fluidics:
             win_fluidics = make_window_fluidics()
@@ -374,6 +394,14 @@ def main():
             if not isinstance(sync_file, pathlib.PurePath):
                 sg.popup_error('Setting sync file did not work, likely the file already exists. Please delete. More infos in the log.')
             win_sync_file_create['-SYNC_FILE_CREATE-'].update(str(sync_file))
+
+        # ******************************************************************************************************
+        # >> TTL sync
+        # ******************************************************************************************************
+        elif event == '-INIT_TTL_SYNC-':
+            if not M:
+                M = TTL_sync(logger=logger, logger_short=logger_stream)
+            sync_file = M.connect_serial_port(file_config_TTL=values['-TTL_CONFIG_FILE-'])
 
         # ******************************************************************************************************
         # >> pycroManager
