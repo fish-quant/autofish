@@ -349,7 +349,7 @@ class TTL_sync(Microscope):
             # self.log_msg('info', f'Serial received {txt_serial}')
 
             if txt_serial == 'finished':
-                self.log_msg('info', 'Acqusition seems to be terminated')
+                self.log_msg('info', 'Acquisition seems to be terminated!')
                 imaging = False
 
             time.sleep(0.1)
