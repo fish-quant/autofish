@@ -15,10 +15,35 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 
 ### Installation
 
-1. Download latest version of miniconda from [**here**](https://docs.conda.io/en/latest/miniconda.html) (can also be Python 3.X).
+We recommend using a package manager (conda) to maintain a clean Python installation. This nees to be done only once.
+
+1. Download latest version of miniconda from [**here**](https://docs.conda.io/en/latest/miniconda.html).
 2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.9`
 3. Activate environment: `conda activate autofish`
-4. Pip install `pip install -i https://test.pypi.org/simple/ autofish`
+4. Pip install autofish
+   - Base version (without pycromanager) : `pip install -i https://test.pypi.org/simple/autofish`
+   - Install pycromanager : `pip install pycromanager` 
+
+#### Installation for development
+
+If you want to further develop the package, several options exist. A simply one is local installation.
+
+
+Rather than performing the pip install from pypi (step 4 above), you can install it locally
+
+1. Download the zip archive locally of the repository
+2. Open Anaconda terminal at location of the autofish package.
+3. Activate environment: `conda activate autofish`
+4. Editable install `pip install . -e`
+
+### Pycromanager
+
+One of the acquisition options is via Pycromanager. We found that keeping both micromanager and Pycromanager up-to-date can help to prevent problems.
+
+**Last tested, compatible versions**:
+
+- Pycromanager: 0.27.2
+- Micromanager: nightly 20230224
 
 ### Starting autofish
 
@@ -29,9 +54,9 @@ See dedicated documentation [**here**](https://github.com/fish-quant/autofish/bl
 
 The behavior of the fluidics and acquistion system is defined by several config files.
 
-* To test the installation of autofish, you can use demo configurations which require neither a microscope nor a fluidics systems: <https://github.com/fish-quant/autofish/tree/main/demo>
+- To test the installation of autofish, you can use demo configurations which require neither a microscope nor a fluidics systems: <https://github.com/fish-quant/autofish/tree/main/demo>
 
-* We provide config files that we use on our system (with a Nikon Ti): <https://github.com/fish-quant/autofish/tree/main/configs>
+- We provide config files that we use on our system (with a Nikon Ti): <https://github.com/fish-quant/autofish/tree/main/configs>
 
 ### Building the Fluidics system
 

@@ -1,0 +1,8 @@
+{
+    "TTL": {
+        "type": "arduino",
+        "COM": "/dev/tty.usbmodem11301",
+        "baudrate": 9600,
+        "parity": "even"
+    }
+}

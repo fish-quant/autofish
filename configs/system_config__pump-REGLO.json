@@ -1,0 +1,36 @@
+{
+    "pump": {
+        "type": "REGLO DIGITAL",
+        "COM": "COM8",
+        "baudrate": 9600,
+        "test_command": "1#\r",
+        "response": "REGLO DIGITAL",
+        "Revolution": "CCW",
+        "Flowrate": 0.5
+    },
+    "valve_in": {
+        "type": "HAMILTON MVP",
+        "COM": "COM7",
+        "baudrate": 9600,
+        "test_command": "/1h30001R\r",
+        "response": "/0"
+    },
+    "plate": {
+        "type": "CNCRouter3018PRO",
+        "COM": "COM8",
+        "wake_up": "\r\n\r\n",
+        "test_command": "$I\n",
+        "response": "VER:",
+        "baudrate": 115200,
+        "feed": 500
+    },
+    "flow_sensor": {
+        "type": "Sensirion_csv",
+        "log_file": "C:\\Temp\\DataLog.csv",
+        "kernel_size": 20,
+        "flow_min": 20,
+        "delimiter": ",",
+        "separator_thousand": ",",       
+        "separator_decimal": "."
+    }
+}
