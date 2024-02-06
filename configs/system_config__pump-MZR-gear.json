@@ -1,13 +1,13 @@
 {
     "pump": {
-        "type": "LONGER BT100",
+        "type": "MZR gear pump",
         "COM": "COM10",
-        "baudrate": 1200,
-        "parity": "even",
-        "revolution": "CCW",
-        "speed": 60
+        "baudrate": 9600,
+        "test_command": "GTYP\r",
+        "response": "CSD-BX4",
+        "Speed": 100
     },
-    "valve": {
+    "valve_in": {
         "type": "HAMILTON MVP",
         "COM": "COM7",
         "baudrate": 9600,
@@ -28,8 +28,8 @@
         "log_file": "C:\\Temp\\DataLog.csv",
         "kernel_size": 20,
         "flow_min": 20,
-        "delimiter": ";",
-        "separator_thousand": " ",       
-        "separator_decimal": ","
+        "delimiter": ",",
+        "separator_thousand": ",",       
+        "separator_decimal": "."
     }
 }

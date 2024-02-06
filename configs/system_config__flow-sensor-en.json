@@ -7,7 +7,7 @@
         "revolution": "CCW",
         "speed": 60
     },
-    "valve": {
+    "valve_in": {
         "type": "HAMILTON MVP",
         "COM": "COM7",
         "baudrate": 9600,
@@ -30,6 +30,6 @@
         "flow_min": 20,
         "delimiter": ",",
         "separator_thousand": ",",       
-        "separator_decimal": ""
+        "separator_decimal": "."
     }
 }

@@ -8,7 +8,7 @@
         "Revolution": "CCW",
         "Flowrate": 0.5
     },
-    "valve": {
+    "valve_in": {
         "type": "HAMILTON MVP",
         "COM": "COM7",
         "baudrate": 9600,
