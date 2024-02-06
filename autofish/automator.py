@@ -38,6 +38,7 @@ class Robot():
             'robot_zeroed': False,
             'experiment_config': False,
             'buffer_selected': False,
+            'outlet_valve': False,         # Is an outlet valve defined?
             'ready': False,
             'launch_acquisition': True      # Should images be acquired after the completion of this round
         }
@@ -245,11 +246,11 @@ class Robot():
             self.log_msg('info', f'Moving valve to position: {valve_id}')
             if valve_id > 0:
 
-                if self.valve is None:
+                if self.valve_in is None:
                     self.log_msg('error', 'NO VALVE DEFINED. STOPPING SYSTEM.', 'NO VALVE DEFINED. STOPPING SYSTEM.')
                     raise SystemExit
                 else:
-                    self.valve.move(valve_id)
+                    self.valve_in.move(valve_id)
 
             # Move plate
             self.log_msg('info', f'Plate ID: {plate_id}')
@@ -312,6 +313,12 @@ class Robot():
     def run_step(self, step, round_id, total_time):
         """ Run a single step in the fludics cycle.
 
+        - buffer: which buffer from buffer list
+        - pump : pump duration in seconds
+        - pause: pause in seconds
+        - valve_out : select output valve by its ID
+        - wait : wait for user input
+
         == Demo
         Will check if demo is defined. If yes, no call to fluidics system will be executed, and
         times are shortened.
@@ -363,6 +370,30 @@ class Robot():
                 self.pause(param)
             total_time = total_time - float(param/60)
 
+        # == Move output valve
+        elif action == 'valve_out':
+            self.log_msg('info', f'Change output valve to : {param}')
+            
+            if self.valve_out is None:
+                self.log_msg('error', 'NO OUTPUT VALVE DEFINED. STOPPING SYSTEM.', 'NO VALVE DEFINED. STOPPING SYSTEM.')
+                raise SystemExit
+            else:
+                self.valve_out.move(param)
+                self.pause(1)
+            
+        # Specify pump durations per outlet valve
+        elif action == 'pump_valve_out':
+            self.log_msg('info', f'Use these durations for the outlet valves : {param}')
+    
+            if len(param) !=  len(self.valve_out_settings['positions']):
+                self.log_msg('error', 'Pump duration for each output valve has to be specified.')
+                raise SystemExit
+
+            for v_pos, v_t in zip(self.valve_out_settings['positions'], param):
+                self.log_msg('info', f'Outlet valve {v_pos} and pump duration {v_t}.')
+                self.valve_out.move(v_pos)
+                self.pump_run(v_t)
+
         # === Move robot to specified position
         elif action == 'zero_plate':
             self.log_msg('info', 'Moving plate to position Zero')
@@ -388,7 +419,8 @@ class Robot():
         # == Not defined
         else:
             self.log_msg('error', f'Unrecognized step: {action} ')
-
+            raise SystemExit
+        
         return total_time
 
     # >>>> Functions to run one round
@@ -491,6 +523,22 @@ class Robot():
         if 'well_plate' in self.experiment_config.keys():
             self.log_msg('info', 'Calculation positions of wells.')
             self.well_coords = self.calc_well_coords()
+
+
+        # Calculate well positions
+        if 'valve_out' in self.experiment_config.keys():
+            self.log_msg('info', 'Output valve configuration found')
+            self.valve_out_settings = {
+                'positions': self.experiment_config['valve_out']['positions']
+            }
+            self.status['outlet_valve'] = True
+            print(self.valve_out_settings)
+        else:
+            self.valve_out_settings = {
+                'positions': ['not-available']
+            }
+            self.status['outlet_valve'] = False
+
 
     def check_plate_positions(self,):
         """
@@ -847,17 +895,22 @@ class Robot():
                 else:
                     self.plate = None
 
-                if 'valve' in self.config_system.keys():
-                    self.valve = self.assign_valve()
+                if 'valve_in' in self.config_system.keys():
+                    self.valve_in = self.assign_valve(valve_id='valve_in')
                 else:
-                    self.valve = None
+                    self.valve_in = None
+
+                if 'valve_out' in self.config_system.keys():
+                    self.valve_out = self.assign_valve(valve_id='valve_out')
+                else:
+                    self.valve_out = None                   
 
                 if 'flow_sensor' in self.config_system.keys():
                     self.sensor = self.assign_sensor()
                 else:
                     self.sensor = None
 
-                if False not in (self.pump, self.valve, self.plate, self.sensor):
+                if False not in (self.pump, self.valve_in, self.valve_out, self.plate, self.sensor):
                     self.log_msg('info', 'All components assigned.')
                     self.status['ports_assigned'] = True
                     self.status['robot_zeroed'] = False
@@ -955,32 +1008,32 @@ class Robot():
             self.log_msg('error', 'UNKNOWN PUMP')
             return False
 
-    def assign_valve(self):
+    def assign_valve(self,valve_id):
         """assign_valve _summary_
 
         Returns:
             _type_: _description_
         """
 
-        self.log_msg('info', 'Assigning valve.')
+        self.log_msg('info', f'Assigning valve : {valve_id}')
 
         # Function selecting the appropriate valve class
-        if len(self.config_system['valve']['type']) == 0:
+        if len(self.config_system[valve_id]['type']) == 0:
             self.log_msg('error', 'No valve defined!')
-            self.log_msg('error', f'{self.config_system["valve"]}')
+            self.log_msg('error', f'{self.config_system[valve_id]}')
             return False
 
-        if 'ser' not in self.config_system['valve'].keys():
+        if 'ser' not in self.config_system[valve_id].keys():
             self.log_msg('error', 'No serial port connection for valve established!')
-            self.log_msg('error', f'{self.config_system["valve"]}')
+            self.log_msg('error', f'{self.config_system[valve_id]}')
             return False
 
-        if self.config_system['valve']['type'] == 'HAMILTON MVP':
-            self.log_msg('info', f'HAMILTON valve on port {self.config_system["valve"]["ser"].portstr}')
+        if self.config_system[valve_id]['type'] == 'HAMILTON MVP':
+            self.log_msg('info', f'HAMILTON valve on port {self.config_system[valve_id]["ser"].portstr}')
 
             # Make sure that baudrate is correct
-            ser = self.config_system['valve']['ser']
-            ser.baudrate = self.config_system['valve']['baudrate']
+            ser = self.config_system[valve_id]['ser']
+            ser.baudrate = self.config_system[valve_id]['baudrate']
             return HamiltonMVPController(ser, logger=self.logger)
 
     def assign_plate(self):
@@ -1197,6 +1250,7 @@ class CNCRouter3018PRO(plateController):
                 self.logger.info(self.check_stage())
                 time.sleep(0.5)
 
+            # Move to provided coordinates
             ser.write(('G0 '+axis.upper()+str(coord)+' \n').encode('utf-8')) # Move to provided coordinates
             while 'Idl' not in self.check_stage():  # Wait until move is done before proceeding.
                 time.sleep(0.5)
@@ -1210,14 +1264,14 @@ class CNCRouter3018PRO(plateController):
         """
         try:
 
-            # Move to XY
-            self.plate.move_stage({'X': 0, 'Y': 0})
-            while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
-                self.logger.info(self.plate.check_stage())
+            # Move to Z
+            self.move_stage({'z': 0})
+            while 'Idl' not in self.check_stage():  # Wait until move is done before proceeding.
                 time.sleep(1)
 
-            # Move to Z
-            self.plate.move_stage({'z': 0})
+            # Move to X,Y
+            
+            self.move_stage({'X': 0, 'Y': 0})
             while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
                 time.sleep(1)
 
@@ -1643,7 +1697,7 @@ class HamiltonMVPController(valveController):
             valve_sel (_type_): _description_
         """
 
-        self.logger.info(f'Move valve to buffer index {valve_sel}')
+        self.logger.info(f'Move valve to position {valve_sel}')
 
         # Move only valve 1
         if valve_sel >= 1 & valve_sel <= 8:

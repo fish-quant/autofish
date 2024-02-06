@@ -346,22 +346,22 @@ class TTL_sync(Microscope):
 
             # Read from serial
             txt_serial = self.config_TLL['TTL']['ser'].readline().decode('ascii').rstrip()
-            # self.log_msg('info', f'Serial received {txt_serial}')
+            #self.log_msg('info', f'Serial received {txt_serial}')
 
             if txt_serial == 'finished':
-                self.log_msg('info', 'Acquisition seems to be terminated!')
+                self.log_msg('info', 'Acqusition seems to be terminated')
                 imaging = False
 
-            time.sleep(0.1)
+            time.sleep(0.5)
 
     def close_serial_port(self):
         """_summary_
         """
         if 'ser' in self.config_TLL['TTL'].keys():
-            ser = self.config_TLL['TTL']['ser']
-            if ser is not None:
-                if ser.isOpen() is True:
-                    ser.close()
+                ser = self.config_TLL['TTL']['ser']
+                if ser is not None:
+                    if ser.isOpen() is True:
+                        ser.close()
 
 
 # ------------------------------------------------------------------------------------------------

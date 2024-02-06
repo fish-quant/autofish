@@ -150,6 +150,9 @@ def make_window_fluidics():
          sg.Combo(['To-be-specified'], key='-BUFFER_LIST-'),
          sg.Button('Go to buffer', key='-SELECT_BUFFER-', disabled=True),
          sg.Button('Move to ZERO', key='-MOVE_ZERO-', disabled=True)],
+        [sg.Text('Outlet valve: '),
+         sg.Combo(['Not-available'], key='-OUTLET_VALVE_LIST-'),
+         sg.Button('Select valve', key='-SELECT_OUTLET_VALVE-', disabled=True)],
         [sg.Text('Pump time [s]'),
          sg.InputText(size=(4, None), key='-PUMP_TIME-', default_text='30'),
          sg.Button('Start pump', key='-PUMP-', disabled=True)],
@@ -291,10 +294,15 @@ def main():
                     win_fluidics['-RUN_SEQ-'].update(disabled=False)
                     win_fluidics['-SELECT_BUFFER-'].update(disabled=False)
                     win_fluidics['-MOVE_ZERO-'].update(disabled=False)
+                    if R.status['outlet_valve']: 
+                        win_fluidics['-SELECT_OUTLET_VALVE-'].update(disabled=False)
+                    else:
+                        win_fluidics['-SELECT_OUTLET_VALVE-'].update(disabled=True)
                 else:         
                     win_fluidics['-RUN_SEQ-'].update(disabled=True)
                     win_fluidics['-SELECT_BUFFER-'].update(disabled=True)
                     win_fluidics['-MOVE_ZERO-'].update(disabled=True)
+                    win_fluidics['-SELECT_OUTLET_VALVE-'].update(disabled=True)
 
                 # Pump: can be started only after buffer was selected
                 if R.status['experiment_config'] and R.status['robot_zeroed'] and R.status['buffer_selected']:
@@ -458,6 +466,8 @@ def main():
                 window['-BUFFER_LIST-'].update(value=R.buffer_names[0])
                 window['-SEQ_LIST-'].update(values=R.rounds_available)
                 window['-SEQ_LIST-'].update(value=R.rounds_available[0])
+                window['-OUTLET_VALVE_LIST-'].update(values=R.valve_out_settings['positions'])
+                window['-OUTLET_VALVE_LIST-'].update(value=R.valve_out_settings['positions'][0])
                 R.status['experiment_config'] = True
 
             except (FileNotFoundError, KeyError) as e:
@@ -559,6 +569,17 @@ def main():
             except (UnboundLocalError, AttributeError) as e:
                 logger_stream.error(f'Could not activate pump for specified duration: {pump_time}')
                 logger.error(e)
+
+        # >>>>> Outlet valve
+        elif event == '-SELECT_OUTLET_VALVE-':
+            try:
+                valve_out_id = values['-OUTLET_VALVE_LIST-']
+                R.valve_out.move(valve_out_id)
+
+            except (UnboundLocalError, AttributeError) as e:
+                logger.error(f'Could not select outlet valve: {valve_out}')
+                logger.error(e)
+
 
         # >>>>> Run single round
         elif event == '-RUN_SEQ-':
