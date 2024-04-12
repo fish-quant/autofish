@@ -646,6 +646,9 @@ class Robot():
         if step_action == 'pump' or step_action == 'pause':
             run_time = run_time + int(step_argument)
 
+        if step_action == 'pump_valve_out':
+            run_time = run_time + sum(step_argument)
+
         return buffers_fix, buffers_cycle, run_time
 
     def analyse_sequence(self):

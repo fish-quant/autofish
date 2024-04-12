@@ -153,6 +153,26 @@ class pycroManager(Microscope):
         except Exception as e:
             self.log_msg('error', f'Could not connect to micromanger ({e}).')
 
+
+        # Update certain micromanger properties when specified 
+        # Core-TimeoutMs
+        try:
+            # Update stage speed
+            if 'stage_speed' in self.config.keys():
+                self.xy_stage =  self.core.get_xy_stage_device()
+                print(f'Found XY stage: {self.xy_stage}')
+                self.log_msg('info', f'Updating stage speed to ({self.config["stage_speed"]}).')
+                self.core.set_property(self.xy_stage,'SpeedX',self.config['stage_speed'])
+                self.core.set_property(self.xy_stage,'SpeedY',self.config['stage_speed'])   
+            
+            # Core time-out
+            if 'Core-TimeoutMs' in self.config.keys():
+                self.log_msg('info', f'Updating Core time-out ({self.config["Core-TimeoutMs"]}).')
+                self.core.set_property('Core','TimeoutMs',self.config['Core-TimeoutMs'])    
+
+        except Exception as e:
+            self.log_msg('error', f'Could set micromanger parameters ({e}).')
+
     # Read config file with some settings
     def load_position_list(self, file_pos=None):
         """load_position_list _summary_
