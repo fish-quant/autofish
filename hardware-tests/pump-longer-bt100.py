@@ -1,41 +1,46 @@
 
-#%% TEST HARDWARE : ROBOT : Genmitsu GRBL
+# %% TEST HARDWARE : PUMP : Longer BT100
 # Allows to test if a robot controlled by GRBl (e.g. from Genmitsu) can be controlled
 # - Python code to test if hardware can be accessed
 # - Only parameter to change is COM port
 
 
 # %% Imports
-import time
 import serial
 
 # %% Connect to serial port
-ser = serial.Serial(port = 'COM10',
-                    baudrate = 1200,
+ser = serial.Serial(port='COM10',
+                    baudrate=1200,
                     parity=serial.PARITY_EVEN,
                     stopbits=serial.STOPBITS_ONE,
                     bytesize=serial.EIGHTBITS,
                     timeout=0.5)
 print(ser.isOpen())
 
-#%% Several helper functions
+
+# %% Several helper functions
+
+
 def send_command(ser_cmd):
     ser.write(bytes.fromhex(ser_cmd))
 
+
 def xor_hex(h1, h2):
-  return hex(int(h1, 16) ^ int(h2, 16))[2:]
+    return hex(int(h1, 16) ^ int(h2, 16))[2:]
+
 
 def xor_cmd(ser_cmd):
     arr = ser_cmd.split()
     fcs = '0'
     for i in range(len(arr)):
-        fcs = xor_hex(fcs,arr[i])
+        fcs = xor_hex(fcs, arr[i])
     return fcs
+
 
 def speed_to_hex(speed):
     return int(speed*10).to_bytes(2, "big").hex(' ')
 
-#%% Launch pump
+# %% Launch pump
 
 # Parameters of pump
 speed = 45.2
@@ -48,7 +53,7 @@ if pump_start:
 else:
     str_start = '00'
 
-# Turn clockwise / counte-clockwise
+# Turn clockwise / counter-clockwise
 if pump_cw:
     str_cw = '01'
 else:
