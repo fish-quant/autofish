@@ -19,7 +19,7 @@ try:
     from pycromanager import Core
     from pycromanager import Acquisition, multi_d_acquisition_events, start_headless
 except ImportError:
-    print('Pyrcomanger is not existing, please install if required!')
+    print('Pyrcomanger is not installed, please install if required!')
 
 # ---------------------------------------------------------------------------
 # Parental class

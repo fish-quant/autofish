@@ -9,7 +9,7 @@
 import serial
 
 # %% Connect to serial port
-ser = serial.Serial(port='COM10',
+ser = serial.Serial(port='COM9',
                     baudrate=1200,
                     parity=serial.PARITY_EVEN,
                     stopbits=serial.STOPBITS_ONE,
@@ -43,7 +43,7 @@ def speed_to_hex(speed):
 # %% Launch pump
 
 # Parameters of pump
-speed = 45.2
+speed = 60
 pump_start = False
 pump_cw = False
 

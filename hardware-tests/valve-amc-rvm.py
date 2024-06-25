@@ -19,7 +19,7 @@ print('RVM connected on ',rvm.name)
 #%% Initiate valve according to user guide
 rvm.write(b"/1ZR\r")
 time.sleep(5)
-print('RVM ready')
+print('RVM initiated')
 
 
 #%% Go to port 3
@@ -27,7 +27,9 @@ print('RVM ready')
 #  B ... Move to port wiht shortest path movement
 #  6 ...  go to port 6
 #  R  ... command end
-rvm.write(b"/1B6R\r")
-print('RVM ready')
+port_id = 6
+ser_cmd = "/1B" + str(port_id) + "R\r"
+rvm.write(bytes(ser_cmd, 'utf-8'))
+print(f'RVM moved to port {port_id}')
 
 # %%

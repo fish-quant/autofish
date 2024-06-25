@@ -19,13 +19,13 @@
         "wake_up": "\r\n\r\n",
         "test_command": "$I\n",
         "response": "VER:",
-        "type": "CNCRouter3018PRO",
+        "type": "CNCRouter GRBL",
         "baudrate": 115200,
         "COM": "COM14",
         "feed": 500
     },
     "flow_sensor": {
-        "type": "Sensirion_csv",
+        "type": "Sensirion CSV",
         "log_file": "C:\\Temp\\DataLog.csv",
         "kernel_size": 20,
         "flow_min": 20,

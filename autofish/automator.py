@@ -932,7 +932,7 @@ class Robot():
         """
         self.log_msg('info', 'Assigning sensor')
 
-        if self.config_system['flow_sensor']['type'] == 'Sensirion_csv':
+        if self.config_system['flow_sensor']['type'] == 'Sensirion CSV':
             self.log_msg('info', 'SENSIRION CSV flow sensor with CSV file')
             if not Path(self.config_system['flow_sensor']['log_file']).is_file():
                 self.log_msg('error', f'File for flow measurement not found {self.config_system["flow_sensor"]["log_file"]}!')
@@ -948,6 +948,10 @@ class Robot():
                                    logger=self.logger)
 
             return sensor
+        
+        else:
+            self.log_msg('error', f'Unknown flow sensor: {self.config_system["flow_sensor"]["type"]}')
+            return False
 
     def assign_pump(self):
         """  Use fluidics configuration file and generate a pump object
@@ -1008,7 +1012,7 @@ class Robot():
             return pump
 
         else:
-            self.log_msg('error', 'UNKNOWN PUMP')
+            self.log_msg('error', f'Unknown pump: {self.config_system["pump"]["type"]}')
             return False
 
     def assign_valve(self,valve_id):
@@ -1038,6 +1042,18 @@ class Robot():
             ser = self.config_system[valve_id]['ser']
             ser.baudrate = self.config_system[valve_id]['baudrate']
             return HamiltonMVPController(ser, logger=self.logger)
+        
+        elif self.config_system[valve_id]['type'] == 'AMC RVM':
+            self.log_msg('info', f'AMC RVM valve on port {self.config_system[valve_id]["ser"].portstr}')
+
+            # Make sure that baudrate is correct
+            ser = self.config_system[valve_id]['ser']
+            ser.baudrate = self.config_system[valve_id]['baudrate']
+            return AMCRVMController(ser, logger=self.logger)
+        
+        else:
+            self.log_msg('error', f'Unknown valve: {self.config_system[valve_id]["type"]}')
+            return False
 
     def assign_plate(self):
         """assign_plate _summary_
@@ -1058,14 +1074,17 @@ class Robot():
             self.log_msg('error', f'{self.config_system["plate"]}')
             return False
 
-        if self.config_system['plate']['type'] == 'CNCRouter3018PRO':
+        if self.config_system['plate']['type'] == 'CNCRouter GRBL':
             self.log_msg('info', f'3018 plate robot on port {self.config_system["plate"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['plate']['ser']
             ser.baudrate = self.config_system['plate']['baudrate'] 
-            return CNCRouter3018PRO(ser, self.config_system['plate']['feed'], logger=self.logger)
-
+            return CNCRouterGRBL(ser, self.config_system['plate']['feed'], logger=self.logger)
+        
+        else:
+            self.log_msg('error', f'Unknown plate robot: {self.config_system["plate"]["type"]}')
+            return False
 
 # ---------------------------------------------------------------------------
 # Flow sensor
@@ -1188,7 +1207,7 @@ class plateController():
         '''Move valve '''
 
 
-class CNCRouter3018PRO(plateController):     
+class CNCRouterGRBL(plateController):     
     """ Control a CNC router 3018PRO with Gcode.
 
     Args:
@@ -1203,7 +1222,7 @@ class CNCRouter3018PRO(plateController):
         # Initiate
         self.ser = ser
         self.feed = feed
-        self.logger.info('CNCRouter3018PRO controller initiated.')
+        self.logger.info('CNCRouterGRBL controller initiated.')
 
         # Set status report
         ser.flushInput()
@@ -1672,13 +1691,13 @@ class HamiltonMVPController(valveController):
         except (UnboundLocalError, AttributeError):
             self.logger.error('Could not execute serial command.')
 
-    def valves_init(self, valve_id):
+    def valves_init(self):
         """valves_init _summary_
 
         Args:
             valve_id (_type_): _description_
         """ 
-
+        valve_id = 1
         self.logger.critical('Valve: initiate #  %s', valve_id)
 
         ''' Initialize a MVP valve for h factor commands '''
@@ -1693,41 +1712,74 @@ class HamiltonMVPController(valveController):
         ser_cmd = '/{}h21003R\r'.format(valve_id)
         self.ser.write(ser_cmd.encode('utf-8'))
 
-    def move(self, valve_sel):
+    def move(self, port_id):
         """move _summary_
 
         Args:
-            valve_sel (_type_): _description_
+            port_id (_type_): _description_
         """
 
-        self.logger.info(f'Move valve to position {valve_sel}')
+        self.logger.info(f'Move valve to position {port_id}')
 
-        # Move only valve 1
-        if valve_sel >= 1 & valve_sel <= 8:
-            valve_id = 1
-            valve_pos = valve_sel
-            ser_cmd = '/{}h2600{}R\r'.format(valve_id, valve_pos)
-            self._send_cmd(ser_cmd)
+        valve_id = 1
+        valve_pos = port_id
+        ser_cmd = '/{}h2600{}R\r'.format(valve_id, port_id)
+        self._send_cmd(ser_cmd)
 
-        # Move valve 1 to connect position, and valve 2
-        elif valve_sel >= 9 & valve_sel <= 16:
 
-            # Move valve 1
-            valve_id = 1
-            valve_pos = 8
-            self.logger.info(f' Connecting to valve {valve_id} on position {valve_pos}')
-            try:
-                ser_cmd = '/{}h2600{}R\r'.format(valve_id, valve_pos)
-                self.ser.write(ser_cmd.encode('utf-8'))
-            except (UnboundLocalError, AttributeError):
-                self.logger.error('Could not move valve.')
+class AMCRVMController(valveController):
+    """AMCRVMController _summary_
 
-            # Move valve 2
-            valve_id = 2
-            valve_pos = valve_sel - 8
-            self.logger.info(f' Connecting to valve {valve_id} on position {valve_pos}')
-            try:
-                ser_cmd = '/{}h2600{}R\r'.format(valve_id, valve_pos)
-                self.ser.write(ser_cmd.encode('utf-8'))
-            except (UnboundLocalError, AttributeError):
-                self.logger.error('Could not move valve.')
+    Args:
+        valveController (_type_): _description_
+    """
+
+    def __init__(self, ser, logger):
+
+        # Setting up logger
+        self.logger = logger
+
+        # Initiate
+        self.ser = ser
+        self.valves_init()
+        self.logger.info(f'AMCRVMController initiated.')
+
+    def _send_cmd(self, ser_cmd):
+        """_send_cmd _summary_
+
+        Args:
+            ser_cmd (_type_): _description_
+        """
+
+        self.logger.info('VALVE: command send: %s', ser_cmd)
+        try:
+            self.ser.write(bytes(ser_cmd, 'utf-8'))
+        except (UnboundLocalError, AttributeError):
+            self.logger.error('Could not execute serial command.')
+
+    def valves_init(self):
+        """valves_init _summary_
+
+        Args:
+            valve_id (_type_): _description_
+        """ 
+
+        self.logger.info('Valve: initiate ')
+        self._send_cmd("/1ZR\r")
+        time.sleep(5)
+        self.logger.info('RVM initiated')
+
+    def move(self, port_id):
+        """move _summary_
+
+        Args:
+            port_id (_type_): _description_
+        """
+
+        self.logger.info(f'Move valve to position {port_id}')
+
+        ser_cmd = "/1B" + str(port_id) + "R\r"
+        self._send_cmd(ser_cmd)
+        self.logger.info(f'RVM moved to port {port_id}')
+
+

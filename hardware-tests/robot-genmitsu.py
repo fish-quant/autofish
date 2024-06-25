@@ -9,7 +9,7 @@ import serial
 
 
 # %% Connect to serial port 
-ser = serial.Serial(port = 'COM14',
+ser = serial.Serial(port = 'COM7',
                     baudrate = 115200,
                     parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,
