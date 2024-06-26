@@ -5,7 +5,15 @@
 
 Python library to control an automated fluidics system and perform microscope acquisition for iterative FISH experiments.
 
-See dedicated documentation [**here**](https://github.com/fish-quant/autofish/blob/master/docs/autofish_manual.pdf) for how to install and use this package.
+Documentation of this **package**:
+
+- [**PDF**](https://drive.google.com/file/d/1BJOog03O_1Qd0z9-Iew3j0tdCUELFUi3/view?usp=drive_link)
+- [**WORD**](https://docs.google.com/document/d/1TDRwhDQSY43seuwou7y4bqMeq4aE-g-U/edit?usp=drive_link&ouid=115789064117209337821&rtpof=true&sd=true)
+
+Documentation to **build the fluidics system**:
+
+- [**PDF**](https://drive.google.com/file/d/1uwClR1c6G9sGJg4e6qd6qb3mEDM5nUBS/view?usp=drive_link)
+- [**WORD**](https://docs.google.com/document/d/1WErUkE9Bn6kUm9p4lFHiR1-yyyQqX7Lv/edit?usp=drive_link&ouid=115789064117209337821&rtpof=true&sd=true)
 
 **TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
 
@@ -22,12 +30,11 @@ We recommend using a package manager (conda) to maintain a clean Python installa
 3. Activate environment: `conda activate autofish`
 4. Pip install autofish
    - Base version (without pycromanager) : `pip install -i https://test.pypi.org/simple/autofish`
-   - Install pycromanager : `pip install pycromanager` 
+   - Install pycromanager : `pip install pycromanager`
 
 #### Installation for development
 
 If you want to further develop the package, several options exist. A simply one is local installation.
-
 
 Rather than performing the pip install from pypi (step 4 above), you can install it locally
 
@@ -58,9 +65,6 @@ The behavior of the fluidics and acquistion system is defined by several config 
 
 - We provide config files that we use on our system (with a Nikon Ti): <https://github.com/fish-quant/autofish/tree/main/configs>
 
-### Building the Fluidics system
-
-See dedicated documentation [**here**](https://github.com/fish-quant/autofish/blob/master/docs/fluidics_construction.pdf) for how to build the fluidics system.
 
 ## Reporting a problem/suggestion
 
