@@ -98,7 +98,7 @@ class Robot():
             type (_type_): _description_
             msg (str): _description_
             msg_short (str, optional): _description_. Defaults to ''.
-        """        
+        """
 
         if type == 'info':
             self.logger.info(msg)
@@ -322,7 +322,7 @@ class Robot():
         == Demo
         Will check if demo is defined. If yes, no call to fluidics system will be executed, and
         times are shortened.
-    
+
         """
 
         demo = self.status['demo']
@@ -373,19 +373,19 @@ class Robot():
         # == Move output valve
         elif action == 'valve_out':
             self.log_msg('info', f'Change output valve to : {param}')
-            
+
             if self.valve_out is None:
                 self.log_msg('error', 'NO OUTPUT VALVE DEFINED. STOPPING SYSTEM.', 'NO VALVE DEFINED. STOPPING SYSTEM.')
                 raise SystemExit
             else:
                 self.valve_out.move(param)
                 self.pause(1)
-            
+
         # Specify pump durations per outlet valve
         elif action == 'pump_valve_out':
             self.log_msg('info', f'Use these durations for the outlet valves : {param}')
-    
-            if len(param) !=  len(self.valve_out_settings['positions']):
+
+            if len(param) != len(self.valve_out_settings['positions']):
                 self.log_msg('error', 'Pump duration for each output valve has to be specified.')
                 raise SystemExit
 
@@ -420,7 +420,7 @@ class Robot():
         else:
             self.log_msg('error', f'Unrecognized step: {action} ')
             raise SystemExit
-        
+
         return total_time
 
     # >>>> Functions to run one round
@@ -538,7 +538,6 @@ class Robot():
                 'positions': ['not-available']
             }
             self.status['outlet_valve'] = False
-
 
     def check_plate_positions(self,):
         """
@@ -948,7 +947,7 @@ class Robot():
                                    logger=self.logger)
 
             return sensor
-        
+
         else:
             self.log_msg('error', f'Unknown flow sensor: {self.config_system["flow_sensor"]["type"]}')
             return False
@@ -1015,7 +1014,7 @@ class Robot():
             self.log_msg('error', f'Unknown pump: {self.config_system["pump"]["type"]}')
             return False
 
-    def assign_valve(self,valve_id):
+    def assign_valve(self, valve_id):
         """assign_valve _summary_
 
         Returns:
@@ -1042,7 +1041,7 @@ class Robot():
             ser = self.config_system[valve_id]['ser']
             ser.baudrate = self.config_system[valve_id]['baudrate']
             return HamiltonMVPController(ser, logger=self.logger)
-        
+  
         elif self.config_system[valve_id]['type'] == 'AMC RVM':
             self.log_msg('info', f'AMC RVM valve on port {self.config_system[valve_id]["ser"].portstr}')
 
@@ -1050,7 +1049,7 @@ class Robot():
             ser = self.config_system[valve_id]['ser']
             ser.baudrate = self.config_system[valve_id]['baudrate']
             return AMCRVMController(ser, logger=self.logger)
-        
+
         else:
             self.log_msg('error', f'Unknown valve: {self.config_system[valve_id]["type"]}')
             return False
@@ -1081,7 +1080,7 @@ class Robot():
             ser = self.config_system['plate']['ser']
             ser.baudrate = self.config_system['plate']['baudrate'] 
             return CNCRouterGRBL(ser, self.config_system['plate']['feed'], logger=self.logger)
-        
+
         else:
             self.log_msg('error', f'Unknown plate robot: {self.config_system["plate"]["type"]}')
             return False
@@ -1292,7 +1291,7 @@ class CNCRouterGRBL(plateController):
                 time.sleep(1)
 
             # Move to X,Y
-            
+
             self.move_stage({'X': 0, 'Y': 0})
             while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
                 time.sleep(1)
@@ -1676,7 +1675,7 @@ class HamiltonMVPController(valveController):
         # Initiate
         self.ser = ser
         self.valves_init(1)
-        self.logger.info(f'HamiltonMVPController initiated.')
+        self.logger.info('HamiltonMVPController initiated.')
 
     def _send_cmd(self, ser_cmd):
         """_send_cmd _summary_
@@ -1722,7 +1721,6 @@ class HamiltonMVPController(valveController):
         self.logger.info(f'Move valve to position {port_id}')
 
         valve_id = 1
-        valve_pos = port_id
         ser_cmd = '/{}h2600{}R\r'.format(valve_id, port_id)
         self._send_cmd(ser_cmd)
 
@@ -1742,7 +1740,7 @@ class AMCRVMController(valveController):
         # Initiate
         self.ser = ser
         self.valves_init()
-        self.logger.info(f'AMCRVMController initiated.')
+        self.logger.info('AMCRVMController initiated.')
 
     def _send_cmd(self, ser_cmd):
         """_send_cmd _summary_
@@ -1781,5 +1779,3 @@ class AMCRVMController(valveController):
         ser_cmd = "/1B" + str(port_id) + "R\r"
         self._send_cmd(ser_cmd)
         self.logger.info(f'RVM moved to port {port_id}')
-
-
