@@ -329,9 +329,14 @@ class TTL_sync(Microscope):
         """
 
         # Load file
-        with open(file_config_TTL) as json_file:
-            config_TLL = json.load(json_file)
-        self.log_msg('info', 'Config file for TTL loaded')
+        try:
+            with open(file_config_TTL) as json_file:
+                config_TLL = json.load(json_file)
+            self.log_msg('info', 'Config file for TTL loaded')
+        except OSError as e:
+            self.log_msg('error', f'  Problem when trying to open TTL file: {file_config_TTL}')
+            self.log_msg('error', f'  {e}')
+            return()
 
         # Connect to port
         try:
@@ -346,6 +351,7 @@ class TTL_sync(Microscope):
 
         except serial.SerialException as e:
             self.log_msg('error', f'  ERROR when opening serial port: {e}')
+            return()
 
         self.config_TLL = config_TLL
 
