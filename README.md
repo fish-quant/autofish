@@ -28,7 +28,7 @@ We recommend using a package manager (conda) to maintain a clean Python installa
 1. Download latest version of miniconda from [**here**](https://docs.conda.io/en/latest/miniconda.html).
 2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.9`
 3. Activate environment: `conda activate autofish`
-4. Pip install autofish
+4. Pip install autofish (as an alternative see development installation below)
    - Base version (without pycromanager) : `pip install -i https://test.pypi.org/simple/autofish`
    - Install pycromanager : `pip install pycromanager`
 
@@ -38,10 +38,11 @@ If you want to further develop the package, several options exist. A simply one 
 
 Rather than performing the pip install from pypi (step 4 above), you can install it locally
 
-1. Download the zip archive locally of the repository
-2. Open Anaconda terminal at location of the autofish package.
-3. Activate environment: `conda activate autofish`
-4. Editable install `pip install . -e`
+1. Download the zip archive of the branch you are interested in.
+2. Unzip on your machine.
+3. Open Anaconda terminal at location of the autofish package.
+4. Activate environment: `conda activate autofish`
+5. Editable install `pip install . -e`
 
 ### Pycromanager
 

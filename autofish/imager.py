@@ -336,7 +336,7 @@ class TTL_sync(Microscope):
         except OSError as e:
             self.log_msg('error', f'  Problem when trying to open TTL file: {file_config_TTL}')
             self.log_msg('error', f'  {e}')
-            return()
+            return(False)
 
         # Connect to port
         try:
@@ -351,10 +351,11 @@ class TTL_sync(Microscope):
 
         except serial.SerialException as e:
             self.log_msg('error', f'  ERROR when opening serial port: {e}')
-            return()
+            return(False)
 
         self.config_TLL = config_TLL
-
+        return(True)
+    
     def acquire_images(self):
         """acquire_images _summary_
         """

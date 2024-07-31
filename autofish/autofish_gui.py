@@ -111,7 +111,6 @@ def make_window_file_sync_create():
               ]
     return sg.Window('File-synchronization : write', layout, finalize=True)
 
-
 # Window for fluidics control
 def make_window_fluidics():
     layout = [[sg.Text('Fluidics specification')],
@@ -170,9 +169,9 @@ def make_window_fluidics():
          sg.Button('RUN sequence', key='-RUN_SEQ-', disabled=True),
          sg.Button('STOP sequence', key='-STOP_SEQ-', disabled=False)],
 
-        [sg.HorizontalSeparator()],
-        [sg.Text(' Pippette robot status'),
-         sg.InputText('', key='-PLATE-STATUS-', readonly=True)],
+        #[sg.HorizontalSeparator()],
+        #[sg.Text(' Pippette robot status'),
+        # sg.InputText('', key='-PLATE-STATUS-', readonly=True)],
         ]
 
     return sg.Window('Fluidics - setup fluidics runs', layout, finalize=True)
@@ -182,7 +181,7 @@ def make_window_fluidics():
 def main():
 
     # >>> Start with control window open
-    win_ctrl, win_fluidics, win_scope_pycro, win_sync_file_create, win_sync_file_write = make_window_control(), None, None, None, None
+    win_ctrl, win_fluidics, win_scope_pycro, win_sync_file_create, win_sync_file_write, win_sync_TTL = make_window_control(), None, None, None, None, None
 
     # >>> Initiate control objects
     R = None  # Fluidics robot
@@ -224,7 +223,12 @@ def main():
                             R.pump.stop()
                         except:
                             logger.error('Could not stop pump.')
-                        R.plate.move_zero()
+         
+                        # Zero robot
+                        if R.status['robot_zeroed']:    
+                            R.plate.move_zero()
+                        
+                        # Close serial ports
                         R.close_serial_ports()
 
                     if (M is not None) and (M.__class__.__name__ == 'TTL_sync'):
@@ -314,6 +318,11 @@ def main():
                 if R.status['demo'] and R.status['experiment_config']:
                     win_fluidics['-RUN_SEQ-'].update(disabled=False)
 
+                # Disable verify flow is no sensor is specified
+                if  R.sensor == None:
+                    win_fluidics['-FLOW_verify-'].update(disabled=True)
+                    
+
         # >> pycromanger control
         if win_scope_pycro:
 
@@ -346,13 +355,13 @@ def main():
 
         #  Handle events
         if event == '__TIMEOUT__':
+            pass
+        #    if win_fluidics:
+        #        win_fluidics.Element('-PLATE-STATUS-').update(value='----')
 
-            if win_fluidics:
-                win_fluidics.Element('-PLATE-STATUS-').update(value='No status received.')
-
-                if (R is not None) and not R.status['demo']:
-                    if R.status['ports_assigned']:
-                        win_fluidics.Element('-PLATE-STATUS-').update(value=R.plate.check_stage())
+        #        if (R is not None) and not R.status['demo']:
+        #            if R.status['ports_assigned']:
+        #                win_fluidics.Element('-PLATE-STATUS-').update(value=R.plate.check_stage())
 
         # ******************************************************************************************************
         # >> Main control interface
@@ -409,7 +418,10 @@ def main():
         elif event == '-INIT_TTL_SYNC-':
             if not M:
                 M = TTL_sync(logger=logger, logger_short=logger_stream)
-            sync_file = M.connect_serial_port(file_config_TTL=values['-TTL_CONFIG_FILE-'])
+            TTL_sync_success = M.connect_serial_port(file_config_TTL=values['-TTL_CONFIG_FILE-'])
+            print(TTL_sync_success)
+            if TTL_sync_success:
+                win_sync_TTL['-INIT_TTL_SYNC-'].update(disabled=True)
 
         # ******************************************************************************************************
         # >> pycroManager

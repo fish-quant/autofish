@@ -913,7 +913,7 @@ class Robot():
                     self.sensor = None
 
                 if False not in (self.pump, self.valve_in, self.valve_out, self.plate, self.sensor):
-                    self.log_msg('info', 'All components assigned.')
+                    self.log_msg('info', 'All specified components assigned.')
                     self.status['ports_assigned'] = True
                     self.status['robot_zeroed'] = False
                 else:
@@ -1674,7 +1674,7 @@ class HamiltonMVPController(valveController):
 
         # Initiate
         self.ser = ser
-        self.valves_init(1)
+        self.valves_init()
         self.logger.info('HamiltonMVPController initiated.')
 
     def _send_cmd(self, ser_cmd):
