@@ -19,7 +19,7 @@
         "wake_up": "\r\n\r\n",
         "test_command": "$I\n",
         "response": "VER:",
-        "type": "CNCRouter GRBL",
+        "type": "GRBL robot",
         "baudrate": 115200,
         "COM": "COM14",
         "feed": 500

@@ -1073,13 +1073,13 @@ class Robot():
             self.log_msg('error', f'{self.config_system["plate"]}')
             return False
 
-        if self.config_system['plate']['type'] == 'CNCRouter GRBL':
-            self.log_msg('info', f'3018 plate robot on port {self.config_system["plate"]["ser"].portstr}')
+        if self.config_system['plate']['type'] == 'GRBL robot':
+            self.log_msg('info', f'GRBL plate robot on port {self.config_system["plate"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['plate']['ser']
             ser.baudrate = self.config_system['plate']['baudrate'] 
-            return CNCRouterGRBL(ser, self.config_system['plate']['feed'], logger=self.logger)
+            return GRBLrobot(ser, self.config_system['plate']['feed'], logger=self.logger)
 
         else:
             self.log_msg('error', f'Unknown plate robot: {self.config_system["plate"]["type"]}')
@@ -1193,7 +1193,7 @@ class sensirion_csv(flowSensor):
 
 
 class plateController():
-    """ Base class for cnc plate controller.
+    """ Base class for GRBL plate controller.
     """
 
     def __init__(self):
@@ -1206,8 +1206,8 @@ class plateController():
         '''Move valve '''
 
 
-class CNCRouterGRBL(plateController):     
-    """ Control a CNC router 3018PRO with Gcode.
+class GRBLrobot(plateController):
+    """ Control a GRBL robot with Gcode.
 
     Args:
         plateController (_type_): _description_
@@ -1221,7 +1221,7 @@ class CNCRouterGRBL(plateController):
         # Initiate
         self.ser = ser
         self.feed = feed
-        self.logger.info('CNCRouterGRBL controller initiated.')
+        self.logger.info('GRBLrobot controller initiated.')
 
         # Set status report
         ser.flushInput()
