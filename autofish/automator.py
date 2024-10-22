@@ -337,7 +337,7 @@ class Robot():
         action = list(step.keys())[0]
         param = list(step.values())[0]
 
-        self.log_msg('info', f'STEP: {action}, with parameter {param}')
+        self.log_msg('info', f'>> STEP: {action}, with parameter {param}')
 
         # == Move robot to specified buffer
         if action == 'buffer':
@@ -833,7 +833,7 @@ class Robot():
 
         # Check if demo mode is enabled
         if "demo" in config_system.keys():
-            self.log_msg('info', f"Config file contains demo specification: {config_system['demo']}")
+            self.log_msg('info', f"Demo mode: {config_system['demo']}")
             if config_system['demo'].lower() in ['1', 'true', 't', 'y', 'yes', 'on']:
                 self.status['demo'] = True
                 self.log_msg('info', "DEMO mode enabled")
@@ -858,12 +858,13 @@ class Robot():
         """
 
         config_system = self.config_system
+        error_open_serial_port = False
 
         # Loop over all hardware components to connect to serial port
         if not self.status['demo']:
-            self.log_msg('info', "Establishing serial port connection of different hardware components")
+            self.log_msg('info', "Opening serial port connection to different hardware components")
 
-            # Loop over all entries in system config file
+            # >>> Connect to serial ports when specified
             for hardware_comp in config_system:
 
                 # Ignore demo entry
@@ -872,8 +873,9 @@ class Robot():
 
                 # Verify if hardware component exists
                 if not (hardware_comp in self.hardware_components):
-                    self.log_msg('error', f" Unkown hardware component {hardware_comp}")
-                    self.log_msg('error', f" Supported are only: {self.hardware_components}")
+                    self.log_msg('error', f" Unkown hardware component: {hardware_comp}")
+                    self.log_msg('error', f"   Supported are only: {self.hardware_components}")
+                    error_open_serial_port = True
                     continue
 
                 # >>>> Connect to serial port when specified
@@ -900,8 +902,10 @@ class Robot():
 
                     except serial.SerialException as e:
                         self.log_msg('error', f'  ERROR when opening serial port: {e}')
+                        error_open_serial_port = True
 
-            # >>> Assign all specified robot elements
+            # >>> Assign all specified components
+            self.log_msg('info', "Assigning all components to robot")
             try:
 
                 if 'pump' in self.config_system.keys():
@@ -929,12 +933,12 @@ class Robot():
                 else:
                     self.sensor = None
 
-                if False not in (self.pump, self.valve_in, self.valve_out, self.plate, self.sensor):
-                    self.log_msg('info', 'All specified components assigned.')
+                if False not in (self.pump, self.valve_in, self.valve_out, self.plate, self.sensor) and not (error_open_serial_port):
+                    self.log_msg('info', 'All connected components assigned.')
                     self.status['ports_assigned'] = True
                     self.status['robot_zeroed'] = False
                 else:
-                    self.log_msg('error', 'Could not connect to one or more component (see error above).')
+                    self.log_msg('error', 'Could not assign one or more component (see error above).')
 
             except (UnboundLocalError, AttributeError) as e:
                 self.log_msg('error', f'Assignment of robot components failed. {e}')
@@ -946,10 +950,10 @@ class Robot():
         Returns:
             _type_: _description_
         """
-        self.log_msg('info', 'Assigning sensor')
+        self.log_msg('info', ' Assigning sensor')
 
         if self.config_system['flow_sensor']['type'] == 'Sensirion CSV':
-            self.log_msg('info', 'SENSIRION CSV flow sensor with CSV file')
+            self.log_msg('info', '  SENSIRION CSV flow sensor with CSV file')
             if not Path(self.config_system['flow_sensor']['log_file']).is_file():
                 self.log_msg('error', f'File for flow measurement not found {self.config_system["flow_sensor"]["log_file"]}!')
                 self.log_msg('error', f'{self.config_system["flow_sensor"]}')
@@ -966,7 +970,7 @@ class Robot():
             return sensor
 
         else:
-            self.log_msg('error', f'Unknown flow sensor: {self.config_system["flow_sensor"]["type"]}')
+            self.log_msg('error', f'  Unknown flow sensor: {self.config_system["flow_sensor"]["type"]}')
             return False
 
     def assign_pump(self):
@@ -975,21 +979,21 @@ class Robot():
         Returns:
             _type_: _description_
         """
-        self.log_msg('info', f'Assigning pump: {self.config_system["pump"]["type"]}')
+        self.log_msg('info', f' Assigning pump: {self.config_system["pump"]["type"]}')
 
         # Function selecting the appropriate pump class
         if len(self.config_system['pump']['type']) == 0:
-            self.log_msg('error', 'No pump defined!')
+            self.log_msg('error', '  No pump defined!')
             self.log_msg('error', f'{self.config_system["pump"]}')
             return False
 
         if 'ser' not in self.config_system['pump'].keys():
-            self.log_msg('error', 'No serial port connection for pump established!')
+            self.log_msg('error', '  No serial port connection for pump established!')
             self.log_msg('error', f'{self.config_system["pump"]}')
             return False
 
         if self.config_system['pump']['type'] == 'REGLO DIGITAL':
-            self.log_msg('info', f'REGLO DIGIAL pump on port {self.config_system["pump"]["ser"].portstr}')
+            self.log_msg('info', f'  REGLO DIGIAL pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
@@ -1003,7 +1007,7 @@ class Robot():
             return pump
 
         elif self.config_system['pump']['type'] == 'LONGER BT100':
-            self.log_msg('info', f'LONGER BT100 pump on port {self.config_system["pump"]["ser"].portstr}')
+            self.log_msg('info', f'  LONGER BT100 pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
@@ -1015,7 +1019,7 @@ class Robot():
             return pump
 
         elif self.config_system['pump']['type'] == 'MZR gear pump':
-            self.log_msg('info', f'MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
+            self.log_msg('info', f'  MZR gear pump on port {self.config_system["pump"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['pump']['ser']
@@ -1038,21 +1042,21 @@ class Robot():
             _type_: _description_
         """
 
-        self.log_msg('info', f'Assigning valve : {valve_id}')
+        self.log_msg('info', f' Assigning valve: {valve_id}')
 
         # Function selecting the appropriate valve class
         if len(self.config_system[valve_id]['type']) == 0:
-            self.log_msg('error', 'No valve defined!')
+            self.log_msg('error', '  No valve defined!')
             self.log_msg('error', f'{self.config_system[valve_id]}')
             return False
 
         if 'ser' not in self.config_system[valve_id].keys():
-            self.log_msg('error', 'No serial port connection for valve established!')
+            self.log_msg('error', '  No serial port connection for valve established!')
             self.log_msg('error', f'{self.config_system[valve_id]}')
             return False
 
         if self.config_system[valve_id]['type'] == 'HAMILTON MVP':
-            self.log_msg('info', f'HAMILTON valve on port {self.config_system[valve_id]["ser"].portstr}')
+            self.log_msg('info', f'  HAMILTON valve on port {self.config_system[valve_id]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system[valve_id]['ser']
@@ -1060,7 +1064,7 @@ class Robot():
             return HamiltonMVPController(ser, logger=self.logger)
 
         elif self.config_system[valve_id]['type'] == 'AMC RVM':
-            self.log_msg('info', f'AMC RVM valve on port {self.config_system[valve_id]["ser"].portstr}')
+            self.log_msg('info', f'  AMC RVM valve on port {self.config_system[valve_id]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system[valve_id]['ser']
@@ -1068,7 +1072,7 @@ class Robot():
             return AMCRVMController(ser, logger=self.logger)
 
         else:
-            self.log_msg('error', f'Unknown valve: {self.config_system[valve_id]["type"]}')
+            self.log_msg('error', f'  Unknown valve: {self.config_system[valve_id]["type"]}')
             return False
 
     def assign_plate(self):
@@ -1077,21 +1081,21 @@ class Robot():
         Returns:
             _type_: _description_
         """
-        self.log_msg('info', 'Assigning plate robot.')
+        self.log_msg('info', ' Assigning plate robot.')
 
         # Function selecting the appropriate valve class
         if len(self.config_system['plate']['type']) == 0:
-            self.log_msg('error', 'No plate robot defined!')
+            self.log_msg('error', '  No plate robot defined!')
             self.log_msg('error', f'{self.config_system["plate"]}')
             return False
 
         if 'ser' not in self.config_system['plate'].keys():
-            self.log_msg('error', 'No serial port connection for plate robot established!')
+            self.log_msg('error', '  No serial port connection for plate robot established!')
             self.log_msg('error', f'{self.config_system["plate"]}')
             return False
 
         if self.config_system['plate']['type'] == 'GRBL robot':
-            self.log_msg('info', f'GRBL plate robot on port {self.config_system["plate"]["ser"].portstr}')
+            self.log_msg('info', f'  GRBL plate robot on port {self.config_system["plate"]["ser"].portstr}')
 
             # Make sure that baudrate is correct
             ser = self.config_system['plate']['ser']
@@ -1099,7 +1103,7 @@ class Robot():
             return GRBLrobot(ser, self.config_system['plate']['feed'], logger=self.logger)
 
         else:
-            self.log_msg('error', f'Unknown plate robot: {self.config_system["plate"]["type"]}')
+            self.log_msg('error', f'  Unknown plate robot: {self.config_system["plate"]["type"]}')
             return False
 
 # ---------------------------------------------------------------------------
