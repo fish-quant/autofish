@@ -16,6 +16,9 @@ import os
 import numpy as np
 import csv
 from pathlib import Path
+import importlib
+
+from importlib.metadata import version
 
 # ---------------------------------------------------------------------------
 #  ROBOT class: manages the entire fluidics system
@@ -56,6 +59,9 @@ class Robot():
         else:
             self.logger_short = logger_short
 
+        # Log version
+        self.log_msg('info', f"Using autofish version {version('autofish')}.")
+        
         # Enable demo mode
         if demo:
             self.log_msg('info', "Demo mode ON")
@@ -75,6 +81,7 @@ class Robot():
         self.volume_measurements.append(['Time', 'round', 'buffer', 'duration', 'vol_expected', 'vol_measured'])
 
         # General robot configuration
+        self.hardware_components = ["pump", "plate", "valve_in", "valve_out", "flow_sensor"]
         self.config_file_experiment = []
         self.experiment_config = {}
         self.buffer_names = []
@@ -524,7 +531,6 @@ class Robot():
             self.log_msg('info', 'Calculation positions of wells.')
             self.well_coords = self.calc_well_coords()
 
-
         # Calculate well positions
         if 'valve_out' in self.experiment_config.keys():
             self.log_msg('info', 'Output valve configuration found')
@@ -855,9 +861,20 @@ class Robot():
 
         # Loop over all hardware components to connect to serial port
         if not self.status['demo']:
-            self.log_msg('info', "Establishing serial port connection to different hardware components")
+            self.log_msg('info', "Establishing serial port connection of different hardware components")
 
+            # Loop over all entries in system config file
             for hardware_comp in config_system:
+
+                # Ignore demo entry
+                if hardware_comp == 'demo':
+                    continue
+
+                # Verify if hardware component exists
+                if not (hardware_comp in self.hardware_components):
+                    self.log_msg('error', f" Unkown hardware component {hardware_comp}")
+                    self.log_msg('error', f" Supported are only: {self.hardware_components}")
+                    continue
 
                 # >>>> Connect to serial port when specified
                 if ('COM' in config_system[hardware_comp].keys()):
@@ -905,7 +922,7 @@ class Robot():
                 if 'valve_out' in self.config_system.keys():
                     self.valve_out = self.assign_valve(valve_id='valve_out')
                 else:
-                    self.valve_out = None                   
+                    self.valve_out = None              
 
                 if 'flow_sensor' in self.config_system.keys():
                     self.sensor = self.assign_sensor()
@@ -1041,7 +1058,7 @@ class Robot():
             ser = self.config_system[valve_id]['ser']
             ser.baudrate = self.config_system[valve_id]['baudrate']
             return HamiltonMVPController(ser, logger=self.logger)
-  
+
         elif self.config_system[valve_id]['type'] == 'AMC RVM':
             self.log_msg('info', f'AMC RVM valve on port {self.config_system[valve_id]["ser"].portstr}')
 
@@ -1190,7 +1207,6 @@ class sensirion_csv(flowSensor):
 # ---------------------------------------------------------------------------
 # Plate controlller
 # ---------------------------------------------------------------------------
-
 
 class plateController():
     """ Base class for GRBL plate controller.

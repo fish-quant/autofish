@@ -10,7 +10,6 @@ import logging
 import threading
 from datetime import datetime
 import pathlib
-
 from autofish.automator import Robot
 from autofish.imager import pycroManager, fileSync_write, fileSync_create, TTL_sync
 from autofish.coordinator import Controller
@@ -18,6 +17,7 @@ from autofish.coordinator import Controller
 # ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
+
 
 sg.theme('DarkAmber')
 NAME_SIZE = 23
@@ -459,7 +459,6 @@ def main():
         # >> FLUIDICS system
         # ******************************************************************************************************
         elif event == '-INITIATE_SYSTEM-':
-            logger_stream.info(f'Initiate Robot & open serial ports. More info in log {f_log}')
 
             try:
                 R = Robot(values['-CONFIG_SYSTEM-'], logger=logger, logger_short=logger_stream)
