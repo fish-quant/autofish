@@ -61,7 +61,7 @@ class Robot():
 
         # Log version
         self.log_msg('info', f"Using autofish version {version('autofish')}.")
-        
+
         # Enable demo mode
         if demo:
             self.log_msg('info', "Demo mode ON")
