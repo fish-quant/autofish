@@ -10,14 +10,15 @@ import logging
 import threading
 from datetime import datetime
 import pathlib
-
+import autofish
 from autofish.automator import Robot
 from autofish.imager import pycroManager, fileSync_write, fileSync_create, TTL_sync
 from autofish.coordinator import Controller
-
+from importlib.metadata import version
 # ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
+
 
 sg.theme('DarkAmber')
 NAME_SIZE = 23
@@ -37,9 +38,10 @@ def make_window_control():
               [sg.HorizontalSeparator()],
               [sg.Button('Initiate controller', key='-INITIATE_CONTROL-', disabled=True)],
               [sg.HorizontalSeparator()],
-              [sg.Button('RUN all ROUNDS!', key='-RUN_ALL_ROUNDS-', disabled=True),
-               sg.Button('STOP sequential RUN', key='-STOP_SEQ-', disabled=True)],
-              [sg.Text('Save path'),      sg.Text('                                 ', key='-OUTPUT_DIR_SAVE_IMGS-')],
+              [sg.Button('RUN all ROUNDS!', key='-RUN_ALL_ROUNDS-', disabled=True)
+               #sg.Button('STOP sequential RUN', key='-STOP_SEQ-', disabled=True)
+               ],
+              [sg.Text(''),      sg.Text('                                 ', key='-OUTPUT_DIR_SAVE_IMGS-')],
               ]
 
     return sg.Window('Automator - automate sequential FISH', layout, location=(800, 600), finalize=True)
@@ -166,8 +168,9 @@ def make_window_fluidics():
         [sg.Text(' >>  Run sequences <<')],
         [sg.Text('Choose sequence: '),
          sg.Combo(['To-be-specified'], key='-SEQ_LIST-'),
-         sg.Button('RUN sequence', key='-RUN_SEQ-', disabled=True),
-         sg.Button('STOP sequence', key='-STOP_SEQ-', disabled=False)],
+         sg.Button('RUN sequence', key='-RUN_SEQ-', disabled=True)
+         #sg.Button('STOP sequence', key='-STOP_SEQ-', disabled=False)
+         ],
 
         #[sg.HorizontalSeparator()],
         #[sg.Text(' Pippette robot status'),
@@ -205,6 +208,10 @@ def main():
     handler = logging.FileHandler(f_log, 'w')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
+    logger_stream.info(f'More detailed log file can be found here {handler.baseFilename}.')
+    logger_stream.info(f"Using autofish version {version('autofish')}.")
+    logger.info(f"Using autofish version {version('autofish')}.")
 
     # >>> Event Loop
     while True:
@@ -459,7 +466,6 @@ def main():
         # >> FLUIDICS system
         # ******************************************************************************************************
         elif event == '-INITIATE_SYSTEM-':
-            logger_stream.info(f'Initiate Robot & open serial ports. More info in log {f_log}')
 
             try:
                 R = Robot(values['-CONFIG_SYSTEM-'], logger=logger, logger_short=logger_stream)

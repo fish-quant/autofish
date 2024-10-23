@@ -16,7 +16,7 @@
         "response": "/0"
     },
     "plate": {
-        "type": "CNCRouter GRBL",
+        "type": "GRBL robot",
         "COM": "COM8",
         "wake_up": "\r\n\r\n",
         "test_command": "$I\n",
