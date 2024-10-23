@@ -5,19 +5,27 @@
 
 Python library to control an automated fluidics system and perform microscope acquisition for iterative FISH experiments.
 
-Documentation of this **package**:
-
-- [**PDF**](https://drive.google.com/file/d/1BJOog03O_1Qd0z9-Iew3j0tdCUELFUi3/view?usp=drive_link)
-- [**WORD**](https://docs.google.com/document/d/1TDRwhDQSY43seuwou7y4bqMeq4aE-g-U/edit?usp=drive_link&ouid=115789064117209337821&rtpof=true&sd=true)
-
-Documentation to **build the fluidics system**:
-
-- [**PDF**](https://drive.google.com/file/d/1uwClR1c6G9sGJg4e6qd6qb3mEDM5nUBS/view?usp=drive_link)
-- [**WORD**](https://docs.google.com/document/d/1WErUkE9Bn6kUm9p4lFHiR1-yyyQqX7Lv/edit?usp=drive_link&ouid=115789064117209337821&rtpof=true&sd=true)
-
 **TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
 
 ![fluidics-system](docs/fluidics-overview.png)
+
+## Documentation
+
+We provide details documentation for the fluidics system and the experimental workflows with the links below
+
+### Fluidics system and software usage
+
+- Documentation of this **package**: 
+  [**PDF**](https://drive.google.com/open?id=1-Fr_Dbg0eQDSbhBmq2gmJ1FDb4Uy_ToI&usp=drive_fs)  or 
+  [**WORD**](https://docs.google.com/document/d/1-IA6f02elFrF7JSLvXx199cNjnm8ciBB?rtpof=true&usp=drive_fs)
+
+- Documentation to **build the fluidics system**:
+  [**PDF**](https://drive.google.com/open?id=1-3anf7ieKRPeKJ387K1XaBH0heWWIocm&usp=drive_fs) or 
+  [**WORD**](https://docs.google.com/document/d/1-NUsaEacdTHfEi9gJ_SppbXEfD7z9-im?rtpof=true&usp=drive_fs)
+  
+### Experimental workflows
+
+Coming soon!
 
 ## Getting started
 
