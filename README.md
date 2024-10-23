@@ -7,8 +7,6 @@ Python library to control an automated fluidics system and perform microscope ac
 
 **TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
 
-![fluidics-system](docs/fluidics-overview.png)
-
 ## Documentation
 
 We provide details documentation for the fluidics system and the experimental workflows with the links below
@@ -22,6 +20,10 @@ We provide details documentation for the fluidics system and the experimental wo
 - Documentation to **build the fluidics system**:
   [**PDF**](https://drive.google.com/open?id=1-3anf7ieKRPeKJ387K1XaBH0heWWIocm&usp=drive_fs) or 
   [**WORD**](https://docs.google.com/document/d/1-NUsaEacdTHfEi9gJ_SppbXEfD7z9-im?rtpof=true&usp=drive_fs)
+
+- Documentation to **use a TTL trigger with the LEICA Thunder**:
+  [**PDF**](https://drive.google.com/open?id=1-bkihEoPfgZdNXIDN6bbxiwU0kXM9xOt&usp=drive_fs) or 
+  [**WORD**](https://docs.google.com/document/d/1-ZXZ6kcjAJHre7fJ8rNfXpDT03TYYEI-?rtpof=true&usp=drive_fs)
   
 ### Experimental workflows
 
