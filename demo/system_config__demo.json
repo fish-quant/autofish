@@ -9,7 +9,7 @@
         "Revolution": "CCW",
         "Flowrate": 0.5
     },
-    "valve": {
+    "valve_in": {
         "test_command": "/1h30001R\r",
         "response": "/0",
         "type": "HAMILTON MVP",
@@ -17,15 +17,15 @@
         "COM": "COM11"
     },
     "plate": {
+        "type": "GRBL robot",
         "wake_up": "\r\n\r\n",
         "test_command": "$I\n",
         "response": "VER:",
-        "type": "CNCRouter3018PRO",
         "baudrate": 115200,
         "COM": "COM8"
     },
     "flow_sensor": {
-        "type": "Sensirion_csv",
+        "type": "Sensirion CSV",
         "log_file": "C:\\Temp\\DataLog.csv",
         "kernel_size": 20,
         "flow_min": 20
