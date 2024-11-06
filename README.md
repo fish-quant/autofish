@@ -32,10 +32,10 @@ We provide details documentation for the fluidics system and the experimental wo
 We recommend using a package manager (conda) to maintain a clean Python installation. This nees to be done only once.
 
 1. Download latest version of miniconda from [**here**](https://docs.conda.io/en/latest/miniconda.html).
-2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.9`
+2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.10`
 3. Activate environment: `conda activate autofish`
 4. Pip install **autofish** (as an alternative see development installation below)
-   - Base version (without pycromanager) : `pip install -i https://test.pypi.org/simple/autofish`
+   - Base version (without pycromanager) : `pip install autofish`
    - [Optional] Install pycromanager : `pip install pycromanager`
 
 ### Starting autofish
@@ -46,7 +46,7 @@ We recommend using a package manager (conda) to maintain a clean Python installa
 ### Upgrading to a new version
 
 1. Open Anaconda terminal and activate environment: `conda activate autofish`
-2. Upgrade autoFISH `pip install --upgrade https://test.pypi.org/simple/autofish`
+2. Upgrade autoFISH `pip install --upgrade autofish`
 
 ### Development installation
 
