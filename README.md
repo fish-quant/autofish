@@ -5,9 +5,9 @@
 
 Python library to control an automated fluidics system and perform acquisition on a microscope for sequential FISH experiments.
 
-<img src="docs/instrumentation-control.png" width="400">
+> :warning: **TESTED FOR WINDOWS only**: micromanager and most microscope controls work only under Windows.
 
-**TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
+<img src="docs/instrumentation-control.png" width="400">
 
 ## Protocols for smFISH experiments
 
@@ -21,7 +21,7 @@ We provide details documentation for the fluidics system and the experimental wo
 
 ### Fluidics system and software usage
 
-- Documentation of this **package**: 
+- Documentation to use Python **control software**: 
   [**PDF**](https://drive.google.com/open?id=1-Fr_Dbg0eQDSbhBmq2gmJ1FDb4Uy_ToI&usp=drive_fs) or 
   [**WORD**](https://docs.google.com/document/d/1-IA6f02elFrF7JSLvXx199cNjnm8ciBB?rtpof=true&usp=drive_fs)
 
