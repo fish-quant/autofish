@@ -5,7 +5,15 @@
 
 Python library to control an automated fluidics system and perform acquisition on a microscope for sequential FISH experiments.
 
-**TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
+> :warning: **TESTED FOR WINDOWS only**: micromanager and most microscope controls work only under Windows.
+
+<img src="docs/instrumentation-control.png" width="400">
+
+## Protocols for smFISH experiments
+
+We provide detailed protocols for single molecule FISH adapated to autoFISH [**here**](https://drive.google.com/drive/folders/1m4SFZFpOHzQbgO7dFY38xFbccV2XqMKH?usp=sharing).
+
+<img src="docs/experimental-protocols.png" width="800">
 
 ## Documentation
 
@@ -13,8 +21,8 @@ We provide details documentation for the fluidics system and the experimental wo
 
 ### Fluidics system and software usage
 
-- Documentation of this **package**: 
-  [**PDF**](https://drive.google.com/open?id=1-Fr_Dbg0eQDSbhBmq2gmJ1FDb4Uy_ToI&usp=drive_fs)  or 
+- Documentation to use Python **control software**: 
+  [**PDF**](https://drive.google.com/open?id=1-Fr_Dbg0eQDSbhBmq2gmJ1FDb4Uy_ToI&usp=drive_fs) or 
   [**WORD**](https://docs.google.com/document/d/1-IA6f02elFrF7JSLvXx199cNjnm8ciBB?rtpof=true&usp=drive_fs)
 
 - Documentation to **build the fluidics system**:
@@ -25,6 +33,8 @@ We provide details documentation for the fluidics system and the experimental wo
   [**PDF**](https://drive.google.com/open?id=1-bkihEoPfgZdNXIDN6bbxiwU0kXM9xOt&usp=drive_fs) or 
   [**WORD**](https://docs.google.com/document/d/1-ZXZ6kcjAJHre7fJ8rNfXpDT03TYYEI-?rtpof=true&usp=drive_fs)
 
+<img src="docs/fluidic-system.png" width="800">
+
 ## Getting started
 
 ### Installation
@@ -32,10 +42,10 @@ We provide details documentation for the fluidics system and the experimental wo
 We recommend using a package manager (conda) to maintain a clean Python installation. This nees to be done only once.
 
 1. Download latest version of miniconda from [**here**](https://docs.conda.io/en/latest/miniconda.html).
-2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.9`
+2. Open Anaconda terminal and create dedicated environment: `conda create --name autofish python=3.10`
 3. Activate environment: `conda activate autofish`
 4. Pip install **autofish** (as an alternative see development installation below)
-   - Base version (without pycromanager) : `pip install -i https://test.pypi.org/simple/autofish`
+   - Base version (without pycromanager) : `pip install autofish`
    - [Optional] Install pycromanager : `pip install pycromanager`
 
 ### Starting autofish
@@ -46,7 +56,7 @@ We recommend using a package manager (conda) to maintain a clean Python installa
 ### Upgrading to a new version
 
 1. Open Anaconda terminal and activate environment: `conda activate autofish`
-2. Upgrade autoFISH `pip install --upgrade https://test.pypi.org/simple/autofish`
+2. Upgrade autoFISH `pip install --upgrade autofish`
 
 ### Development installation
 
