@@ -7,9 +7,9 @@ Python library to control an automated fluidics system and perform acquisition o
 
 **TESTED FOR WIN 10 only**: micromanager and most microscope controls work only under Windows.
 
-## Protocols
+## Protocols for smFISH experiments
 
-We provide detailed protocols [**here**](https://drive.google.com/drive/folders/1m4SFZFpOHzQbgO7dFY38xFbccV2XqMKH?usp=sharing).
+We provide detailed protocols for single molecule FISH adapated to autoFISH [**here**](https://drive.google.com/drive/folders/1m4SFZFpOHzQbgO7dFY38xFbccV2XqMKH?usp=sharing).
 
 ## Documentation
 
