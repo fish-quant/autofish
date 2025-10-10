@@ -82,18 +82,18 @@ def make_window_pycromanager():
 def make_window_TTL_sync():
     layout = [[sg.Text('Choose TTL config file:', key='-SPECIFY_TTL_CONFIG_FILE-'),
                sg.FileBrowse(file_types=(("config file", '*.json'),),  target='-TTL_CONFIG_FILE-', disabled=False),
-               sg.InputText('specify-config-microscope', key='-TTL_CONFIG_FILE-')],
+               sg.InputText('specify-TTL-config-file', key='-TTL_CONFIG_FILE-')],
               [sg.HorizontalSeparator()],
               [sg.Button('Connect to TTL sync box', key='-INIT_TTL_SYNC-')],
               ]
-    return sg.Window('File-synchronization : write', layout, finalize=True)
+    return sg.Window('TTL synchronization', layout, finalize=True)
 
 
 # Window for acquisition synchronization via a text file with changing content
 def make_window_file_sync_write():
     layout = [[sg.Text('Choose sync file:', key='-SPECIFY_SYNC_FILE_WRITE-'),
                sg.FileBrowse(file_types=(("sync file", '*.txt'),),  target='-SYNC_FILE_WRITE-', disabled=False),
-               sg.InputText('specify-TTL-config-file', key='-SYNC_FILE_WRITE-')],
+               sg.InputText('specify-sync-file', key='-SYNC_FILE_WRITE-')],
               [sg.HorizontalSeparator()],
               [sg.Button('Initiate sync file', key='-INIT_FILE_SYNC_WRITE-')],
               ]
@@ -168,13 +168,9 @@ def make_window_fluidics():
         [sg.Text(' >>  Run rounds <<')],
         [sg.Text('Choose round: '),
          sg.Combo(['To-be-specified'], key='-SEQ_LIST-'),
-         sg.Button('RUN selected round', key='-RUN_SEQ-', disabled=True)
-         #sg.Button('STOP sequence', key='-STOP_SEQ-', disabled=False)
+         sg.Button('RUN round', key='-RUN_SEQ-', disabled=True)
          ],
 
-        #[sg.HorizontalSeparator()],
-        #[sg.Text(' Pippette robot status'),
-        # sg.InputText('', key='-PLATE-STATUS-', readonly=True)],
         ]
 
     return sg.Window('Fluidics - setup fluidics runs', layout, finalize=True)
@@ -230,7 +226,7 @@ def main():
                             R.pump.stop()
                         except:
                             logger.error('Could not stop pump.')
-
+                            
                         # Zero robot
                         if R.status['robot_zeroed']:    
                             R.plate.move_zero()
@@ -545,7 +541,7 @@ def main():
             except (UnboundLocalError, AttributeError) as e:
                 logger_stream.info('Jog failed. Z+')
                 logger.info('Jog failed. Z+')
-                logger.error(e)  
+                logger.error(e)
 
         # >>>>> Zero stage and move to zero
 
@@ -561,7 +557,8 @@ def main():
 
         elif event == '-MOVE_ZERO-':
             R.plate.move_zero()
-
+            R.current_buffer = None
+            
         # >>>>> Priming/WASHING lines
         elif event == '-SELECT_BUFFER-':
             try:
@@ -594,7 +591,7 @@ def main():
                 R.valve_out.move(valve_out_id)
 
             except (UnboundLocalError, AttributeError) as e:
-                logger.error(f'Could not select outlet valve: {valve_out}')
+                logger.error(f'Could not select outlet valve: {valve_out_id}')
                 logger.error(e)
 
 
