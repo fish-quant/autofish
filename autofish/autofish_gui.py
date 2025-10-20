@@ -5,7 +5,7 @@ autoFISH GUI
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import logging
 import threading
 from datetime import datetime
@@ -28,7 +28,6 @@ microscope_options = ('pycromanager', 'TTL sync', 'file synce - create', 'file s
 def name(name):
     dots = NAME_SIZE-len(name)-2
     return sg.Text(name + ' ' + '•'*dots, size=(NAME_SIZE, 1), justification='r', pad=(0, 0), font='Courier 10')
-
 
 # Window for launch pad
 def make_window_control():
