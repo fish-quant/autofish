@@ -5,7 +5,7 @@ autoFISH GUI
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import logging
 import threading
 from datetime import datetime
@@ -28,7 +28,6 @@ microscope_options = ('pycromanager', 'TTL sync', 'file synce - create', 'file s
 def name(name):
     dots = NAME_SIZE-len(name)-2
     return sg.Text(name + ' ' + '•'*dots, size=(NAME_SIZE, 1), justification='r', pad=(0, 0), font='Courier 10')
-
 
 # Window for launch pad
 def make_window_control():
@@ -82,18 +81,18 @@ def make_window_pycromanager():
 def make_window_TTL_sync():
     layout = [[sg.Text('Choose TTL config file:', key='-SPECIFY_TTL_CONFIG_FILE-'),
                sg.FileBrowse(file_types=(("config file", '*.json'),),  target='-TTL_CONFIG_FILE-', disabled=False),
-               sg.InputText('specify-config-microscope', key='-TTL_CONFIG_FILE-')],
+               sg.InputText('specify-TTL-config-file', key='-TTL_CONFIG_FILE-')],
               [sg.HorizontalSeparator()],
-              [sg.Button('Connect to SYNC box', key='-INIT_TTL_SYNC-')],
+              [sg.Button('Connect to TTL sync box', key='-INIT_TTL_SYNC-')],
               ]
-    return sg.Window('File-synchronization : write', layout, finalize=True)
+    return sg.Window('TTL synchronization', layout, finalize=True)
 
 
 # Window for acquisition synchronization via a text file with changing content
 def make_window_file_sync_write():
     layout = [[sg.Text('Choose sync file:', key='-SPECIFY_SYNC_FILE_WRITE-'),
                sg.FileBrowse(file_types=(("sync file", '*.txt'),),  target='-SYNC_FILE_WRITE-', disabled=False),
-               sg.InputText('specify-config-microscope', key='-SYNC_FILE_WRITE-')],
+               sg.InputText('specify-sync-file', key='-SYNC_FILE_WRITE-')],
               [sg.HorizontalSeparator()],
               [sg.Button('Initiate sync file', key='-INIT_FILE_SYNC_WRITE-')],
               ]
@@ -165,16 +164,12 @@ def make_window_fluidics():
          sg.Text('Tolerance'), sg.InputText(size=(4, None), key='-FLOW_tol-', default_text='0.25')],
 
         [sg.HorizontalSeparator()],
-        [sg.Text(' >>  Run sequences <<')],
-        [sg.Text('Choose sequence: '),
+        [sg.Text(' >>  Run rounds <<')],
+        [sg.Text('Choose round: '),
          sg.Combo(['To-be-specified'], key='-SEQ_LIST-'),
-         sg.Button('RUN sequence', key='-RUN_SEQ-', disabled=True)
-         #sg.Button('STOP sequence', key='-STOP_SEQ-', disabled=False)
+         sg.Button('RUN round', key='-RUN_SEQ-', disabled=True)
          ],
 
-        #[sg.HorizontalSeparator()],
-        #[sg.Text(' Pippette robot status'),
-        # sg.InputText('', key='-PLATE-STATUS-', readonly=True)],
         ]
 
     return sg.Window('Fluidics - setup fluidics runs', layout, finalize=True)
@@ -230,11 +225,11 @@ def main():
                             R.pump.stop()
                         except:
                             logger.error('Could not stop pump.')
-         
+                            
                         # Zero robot
                         if R.status['robot_zeroed']:    
                             R.plate.move_zero()
-                        
+
                         # Close serial ports
                         R.close_serial_ports()
 
@@ -242,7 +237,7 @@ def main():
                         try:
                             M.close_serial_port()
                         except:
-                            logger.error('No serial port .')
+                            logger.error('No serial port.')
 
                 except (UnboundLocalError, AttributeError) as e:
                     logger_stream.error('Could not close serial connections')
@@ -328,7 +323,6 @@ def main():
                 # Disable verify flow is no sensor is specified
                 if  R.sensor == None:
                     win_fluidics['-FLOW_verify-'].update(disabled=True)
-                    
 
         # >> pycromanger control
         if win_scope_pycro:
@@ -546,7 +540,7 @@ def main():
             except (UnboundLocalError, AttributeError) as e:
                 logger_stream.info('Jog failed. Z+')
                 logger.info('Jog failed. Z+')
-                logger.error(e)  
+                logger.error(e)
 
         # >>>>> Zero stage and move to zero
 
@@ -562,7 +556,8 @@ def main():
 
         elif event == '-MOVE_ZERO-':
             R.plate.move_zero()
-
+            R.current_buffer = None
+            
         # >>>>> Priming/WASHING lines
         elif event == '-SELECT_BUFFER-':
             try:
@@ -595,7 +590,7 @@ def main():
                 R.valve_out.move(valve_out_id)
 
             except (UnboundLocalError, AttributeError) as e:
-                logger.error(f'Could not select outlet valve: {valve_out}')
+                logger.error(f'Could not select outlet valve: {valve_out_id}')
                 logger.error(e)
 
 

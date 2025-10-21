@@ -61,7 +61,7 @@ class Robot():
 
         # Log version
         self.log_msg('info', f"Using autofish version {version('autofish')}.")
-
+        
         # Enable demo mode
         if demo:
             self.log_msg('info', "Demo mode ON")
@@ -398,13 +398,17 @@ class Robot():
 
             for v_pos, v_t in zip(self.valve_out_settings['positions'], param):
                 self.log_msg('info', f'Outlet valve {v_pos} and pump duration {v_t}.')
+                if v_t == 0:
+                    self.log_msg('info', f'Pump duration {v_t}: will move to next valve')
+                    continue 
                 self.valve_out.move(v_pos)
                 self.pump_run(v_t)
 
-        # === Move robot to specified position
+        # === Move robot to specified zero positin
         elif action == 'zero_plate':
             self.log_msg('info', 'Moving plate to position Zero')
             self.plate.move_zero()
+            
 
         # === Wait for user input
         elif action == 'wait':
@@ -1311,7 +1315,6 @@ class GRBLrobot(plateController):
                 time.sleep(1)
 
             # Move to X,Y
-
             self.move_stage({'X': 0, 'Y': 0})
             while 'Idl' not in self.plate.check_stage():  # Wait until move is done before proceeding.
                 time.sleep(1)

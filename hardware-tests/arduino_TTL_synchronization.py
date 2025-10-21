@@ -9,11 +9,9 @@
 import serial
 import time
 
-arduino = serial.Serial(port='COM10', baudrate=9600, timeout=1)
-
-
+#arduino = serial.Serial(port='COM10', baudrate=9600, timeout=1)
+arduino = serial.Serial(port='/dev/cu.usbmodem11301', baudrate=9600, timeout=1)
 # %% Connect to arduino and run a while loop 
-# arduino = serial.Serial(port='COM10', baudrate=9600, timeout=1)
 
 while True:
     i = input("start / exit:")

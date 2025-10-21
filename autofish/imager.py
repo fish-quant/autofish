@@ -14,7 +14,6 @@ from threading import Event
 import gc
 from pathlib import Path
 
-
 try:
     from pycromanager import Core
     from pycromanager import Acquisition, multi_d_acquisition_events, start_headless
@@ -162,13 +161,13 @@ class pycroManager(Microscope):
                 self.xy_stage =  self.core.get_xy_stage_device()
                 print(f'Found XY stage: {self.xy_stage}')
                 self.log_msg('info', f'Updating stage speed to ({self.config["stage_speed"]}).')
-                self.core.set_property(self.xy_stage,'SpeedX',self.config['stage_speed'])
-                self.core.set_property(self.xy_stage,'SpeedY',self.config['stage_speed'])   
+                self.core.set_property(self.xy_stage,'SpeedX', self.config['stage_speed'])
+                self.core.set_property(self.xy_stage,'SpeedY', self.config['stage_speed'])   
             
             # Core time-out
             if 'Core-TimeoutMs' in self.config.keys():
                 self.log_msg('info', f'Updating Core time-out ({self.config["Core-TimeoutMs"]}).')
-                self.core.set_property('Core','TimeoutMs',self.config['Core-TimeoutMs'])    
+                self.core.set_property('Core', 'TimeoutMs', self.config['Core-TimeoutMs'])    
 
         except Exception as e:
             self.log_msg('error', f'Could set micromanger parameters ({e}).')
@@ -336,7 +335,7 @@ class TTL_sync(Microscope):
         except OSError as e:
             self.log_msg('error', f'  Problem when trying to open TTL file: {file_config_TTL}')
             self.log_msg('error', f'  {e}')
-            return(False)
+            return (False)
 
         # Connect to port
         try:
@@ -351,10 +350,10 @@ class TTL_sync(Microscope):
 
         except serial.SerialException as e:
             self.log_msg('error', f'  ERROR when opening serial port: {e}')
-            return(False)
+            return (False)
 
         self.config_TLL = config_TLL
-        return(True)
+        return (True)
     
     def acquire_images(self):
         """acquire_images _summary_
@@ -364,31 +363,32 @@ class TTL_sync(Microscope):
         # send 'Start acquisition'
         self.config_TLL['TTL']['ser'].write(('start' + '\n').encode())
 
-        # Read from serial port until acquisition is done
-        self.log_msg('info', 'Checking TTL for completion')
+        # Wait for the specified duration in the TTL file
+        if 'wait_time' in self.config_TLL['TTL'].keys():
+            self.log_msg('info', f'Waiting for specified time: {self.config_TLL["TTL"]["wait_time"]} seconds')
+            time.sleep(self.config_TLL['TTL']['wait_time'])
 
-        imaging = True
+        # Wait until 'finished' is received from serial port
+        else:
+            self.log_msg('info', 'Checking TTL for completion')
+            imaging = True
+            while imaging:
+                # Read from serial
+                txt_serial = self.config_TLL['TTL']['ser'].readline().decode('ascii').rstrip()
+                if txt_serial == 'finished':
+                    self.log_msg('info', 'Acqusition seems to be terminated')
+                    imaging = False
 
-        while imaging:
-
-            # Read from serial
-            txt_serial = self.config_TLL['TTL']['ser'].readline().decode('ascii').rstrip()
-            #self.log_msg('info', f'Serial received {txt_serial}')
-
-            if txt_serial == 'finished':
-                self.log_msg('info', 'Acqusition seems to be terminated')
-                imaging = False
-
-            time.sleep(0.5)
+                time.sleep(0.5)
 
     def close_serial_port(self):
         """_summary_
         """
         if 'ser' in self.config_TLL['TTL'].keys():
-                ser = self.config_TLL['TTL']['ser']
-                if ser is not None:
-                    if ser.isOpen() is True:
-                        ser.close()
+            ser = self.config_TLL['TTL']['ser']
+            if ser is not None:
+                if ser.isOpen() is True:
+                    ser.close()
 
 
 # ------------------------------------------------------------------------------------------------
