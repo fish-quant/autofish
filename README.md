@@ -11,27 +11,21 @@ Python library to control an automated fluidics system and perform acquisition o
 
 ## Protocols for smFISH experiments
 
-We provide detailed protocols for single molecule FISH adapated to autoFISH [**here**](https://drive.google.com/drive/folders/1m4SFZFpOHzQbgO7dFY38xFbccV2XqMKH?usp=sharing).
+We provide detailed protocols for single molecule FISH adapated to autoFISH [**here**](https://doi.org/10.5281/zenodo.17965896).
+
+- **smFISH base protocol**: smFISH_base-protocol
+- **Clearing protocol**: smFISH_clearing
+- **Clearing protocol**: smFISH_SABER
 
 <img src="docs/experimental-protocols.png" width="800">
 
-## Documentation
+## Documentation for fluidics and automation
 
-We provide details documentation for the fluidics system and the experimental workflows with the links below:
+We provide details documentation for the fluidics system and the experimental workflows [**here**](https://doi.org/10.5281/zenodo.17965896)
 
-### Fluidics system and software usage
-
-- Documentation to use Python **control software**: 
-  [**PDF**](https://drive.google.com/open?id=1-Fr_Dbg0eQDSbhBmq2gmJ1FDb4Uy_ToI&usp=drive_fs) or 
-  [**WORD**](https://docs.google.com/document/d/1-IA6f02elFrF7JSLvXx199cNjnm8ciBB?rtpof=true&usp=drive_fs)
-
-- Documentation to **build the fluidics system**:
-  [**PDF**](https://drive.google.com/open?id=1-3anf7ieKRPeKJ387K1XaBH0heWWIocm&usp=drive_fs) or 
-  [**WORD**](https://docs.google.com/document/d/1-NUsaEacdTHfEi9gJ_SppbXEfD7z9-im?rtpof=true&usp=drive_fs)
-
-- Documentation to **use a TTL trigger with the LEICA Thunder**:
-  [**PDF**](https://drive.google.com/open?id=1-bkihEoPfgZdNXIDN6bbxiwU0kXM9xOt&usp=drive_fs) or 
-  [**WORD**](https://docs.google.com/document/d/1-ZXZ6kcjAJHre7fJ8rNfXpDT03TYYEI-?rtpof=true&usp=drive_fs)
+- Documentation to use Python **control software**: autofish_software-manual
+- Documentation to **build the fluidics system**: autofish_fluidics-construction
+- Documentation to **use a TTL trigger with the LEICA Thunder**: autofish_TTL-Leica-Thunder
 
 <img src="docs/fluidic-system.png" width="800">
 
