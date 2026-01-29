@@ -63,7 +63,7 @@ If you want to modify develop the package, several options exist.
    2. Unzip on your machine.
    3. Open Anaconda terminal at location of the autofish package.
    4. Activate environment: `conda activate autofish`
-   5. Editable install `pip install . -e`
+   5. Editable install `pip install -e .`
 
 ### Configuration files
 
